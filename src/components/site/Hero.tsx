@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LogoMark } from "@/components/Logo";
-import LiquidBackground from "./LiquidBackground";
-import LiquidImage from "./LiquidImage";
+import WaterHero from "./WaterHero";
 
 type Card = { label: string; url: string | null; tone: "live" | "3d" };
 
@@ -69,23 +68,12 @@ export default function Hero({
             "radial-gradient(120% 95% at 72% 8%, rgba(218,78,42,0.22), rgba(11,9,8,0) 55%), #0B0908",
         }}
       />
-      {heroImage ? (
-        <LiquidImage
-          src={heroImage}
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full"
-        />
-      ) : (
-        <LiquidBackground className="pointer-events-none absolute inset-0 z-0 h-full w-full" />
-      )}
-      <div
-        className={
-          "pointer-events-none absolute inset-0 z-0 bg-gradient-to-r " +
-          (heroImage
-            ? "from-ink/90 via-ink/60 to-ink/30"
-            : "from-ink/85 via-ink/40 to-ink/10")
-        }
+      <WaterHero
+        src={heroImage}
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full"
       />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-40 bg-gradient-to-t from-ink to-transparent" />
+      <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-r from-ink/90 via-ink/45 to-ink/15" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-32 bg-gradient-to-t from-ink/90 to-transparent" />
 
       <div className="container-x relative z-10 grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="relative z-10">
