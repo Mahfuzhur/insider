@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model ProjectType {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  order     Int       @default(0)
+  projects  Project[]
+  createdAt DateTime  @default(now())
+}
+
+model Project {
+  id                String         @id @default(cuid())
+  title             String
+  slug              String         @unique
+  typeId            String
+  type              ProjectType    @relation(fields: [typeId], references: [id])
+  location          String?
+  areaSqft          Int?
+  yearCompleted     Int?
+  duration          String?
+  rooms             String?        @db.Text // JSON array string e.g. ["Kitchen","Bedroom"]
+  shortDescription  String?        @db.Text
+  designStyle       String?
+  testimonial       String?        @db.Text
+  testimonialAuthor String?
+  featured          Boolean        @default(false)
+  published         Boolean        @default(true)
+  order             Int            @default(0)
+  images            ProjectImage[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([typeId])
+}
+
+model ProjectImage {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  url       String
+  category  String  @default("live") // "3d" | "live"
+  alt       String?
+  isCover   Boolean @default(false)
+  order     Int     @default(0)
+
+  @@index([projectId])
+}
+
+model Service {
+  id          String  @id @default(cuid())
+  title       String
+  description  String? @db.Text
+  icon        String  @default("ti-armchair")
+  order       Int     @default(0)
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SiteSetting {
+  id          Int      @id @default(1)
+  heroLine    String   @default("Adorn your world")
+  heroWords   String   @default("residences,workspaces,interiors,commercial")
+  heroTagline String   @db.Text
+  aboutTitle  String   @default("We craft interiors that feel unmistakably yours")
+  aboutBody   String   @db.Text
+  email       String   @default("info@insider.com.bd")
+  phone       String   @default("+8801733-516028")
+  address     String   @default("House 07, Road 1/C, Block L, Banani Chairman Bari, Dhaka-1212")
+  facebook    String   @default("https://www.facebook.com/insiderltd")
+  logoUrl     String?
+  updatedAt   DateTime @updatedAt
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}

@@ -1,0 +1,233 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/session";
+import { slugify, stringifyRooms } from "@/lib/utils";
+
+function str(fd: FormData, key: string): string {
+  return String(fd.get(key) ?? "").trim();
+}
+function num(fd: FormData, key: string): number | null {
+  const v = str(fd, key);
+  if (!v) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.round(n) : null;
+}
+function bool(fd: FormData, key: string): boolean {
+  return fd.get(key) === "on" || fd.get(key) === "true";
+}
+
+async function uniqueSlug(base: string, ignoreId?: string): Promise<string> {
+  const root = slugify(base) || "project";
+  let slug = root;
+  let i = 2;
+  while (true) {
+    const existing = await prisma.project.findUnique({ where: { slug } });
+    if (!existing || existing.id === ignoreId) return slug;
+    slug = `${root}-${i++}`;
+  }
+}
+
+function refreshSite() {
+  revalidatePath("/");
+  revalidatePath("/projects");
+}
+
+/* ---------- Projects ---------- */
+
+export async function createProject(fd: FormData) {
+  await requireSession();
+  const title = str(fd, "title") || "Untitled project";
+  const typeId = str(fd, "typeId");
+  if (!typeId) throw new Error("A category is required.");
+
+  const project = await prisma.project.create({
+    data: { title, slug: await uniqueSlug(title), typeId },
+  });
+  refreshSite();
+  redirect(`/admin/projects/${project.id}`);
+}
+
+export async function updateProject(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const title = str(fd, "title");
+  await prisma.project.update({
+    where: { id },
+    data: {
+      title,
+      slug: await uniqueSlug(str(fd, "slug") || title, id),
+      typeId: str(fd, "typeId"),
+      location: str(fd, "location") || null,
+      areaSqft: num(fd, "areaSqft"),
+      yearCompleted: num(fd, "yearCompleted"),
+      duration: str(fd, "duration") || null,
+      designStyle: str(fd, "designStyle") || null,
+      shortDescription: str(fd, "shortDescription") || null,
+      testimonial: str(fd, "testimonial") || null,
+      testimonialAuthor: str(fd, "testimonialAuthor") || null,
+      rooms: stringifyRooms(
+        str(fd, "rooms").split(",").map((r) => r.trim())
+      ),
+      featured: bool(fd, "featured"),
+      published: bool(fd, "published"),
+      order: num(fd, "order") ?? 0,
+    },
+  });
+  refreshSite();
+  revalidatePath(`/admin/projects/${id}`);
+  redirect("/admin/projects");
+}
+
+export async function deleteProject(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  await prisma.project.delete({ where: { id } });
+  refreshSite();
+  redirect("/admin/projects");
+}
+
+export async function deleteImage(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const projectId = str(fd, "projectId");
+  await prisma.projectImage.delete({ where: { id } });
+  refreshSite();
+  revalidatePath(`/admin/projects/${projectId}`);
+}
+
+export async function setCover(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const projectId = str(fd, "projectId");
+  await prisma.projectImage.updateMany({
+    where: { projectId },
+    data: { isCover: false },
+  });
+  await prisma.projectImage.update({ where: { id }, data: { isCover: true } });
+  refreshSite();
+  revalidatePath(`/admin/projects/${projectId}`);
+}
+
+/* ---------- Categories (types) ---------- */
+
+export async function createType(fd: FormData) {
+  await requireSession();
+  const name = str(fd, "name");
+  if (!name) return;
+  const slug = slugify(name);
+  const exists = await prisma.projectType.findFirst({
+    where: { OR: [{ name }, { slug }] },
+  });
+  if (!exists) {
+    const count = await prisma.projectType.count();
+    await prisma.projectType.create({ data: { name, slug, order: count } });
+  }
+  refreshSite();
+  revalidatePath("/admin/types");
+}
+
+export async function deleteType(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const inUse = await prisma.project.count({ where: { typeId: id } });
+  if (inUse === 0) await prisma.projectType.delete({ where: { id } });
+  refreshSite();
+  revalidatePath("/admin/types");
+}
+
+/* ---------- Services ---------- */
+
+export async function createService(fd: FormData) {
+  await requireSession();
+  const count = await prisma.service.count();
+  await prisma.service.create({
+    data: {
+      title: str(fd, "title") || "New service",
+      description: str(fd, "description") || null,
+      icon: str(fd, "icon") || "ti-armchair",
+      order: count,
+    },
+  });
+  refreshSite();
+  revalidatePath("/admin/services");
+}
+
+export async function updateService(fd: FormData) {
+  await requireSession();
+  await prisma.service.update({
+    where: { id: str(fd, "id") },
+    data: {
+      title: str(fd, "title"),
+      description: str(fd, "description") || null,
+      icon: str(fd, "icon") || "ti-armchair",
+      order: num(fd, "order") ?? 0,
+    },
+  });
+  refreshSite();
+  revalidatePath("/admin/services");
+}
+
+export async function deleteService(fd: FormData) {
+  await requireSession();
+  await prisma.service.delete({ where: { id: str(fd, "id") } });
+  refreshSite();
+  revalidatePath("/admin/services");
+}
+
+/* ---------- Settings ---------- */
+
+export async function updateSettings(fd: FormData) {
+  await requireSession();
+  const data = {
+    heroLine: str(fd, "heroLine"),
+    heroWords: str(fd, "heroWords"),
+    heroTagline: str(fd, "heroTagline"),
+    aboutTitle: str(fd, "aboutTitle"),
+    aboutBody: str(fd, "aboutBody"),
+    email: str(fd, "email"),
+    phone: str(fd, "phone"),
+    address: str(fd, "address"),
+    facebook: str(fd, "facebook"),
+  };
+  await prisma.siteSetting.upsert({
+    where: { id: 1 },
+    update: data,
+    create: { id: 1, ...data },
+  });
+  refreshSite();
+  revalidatePath("/admin/settings");
+}
+
+export async function removeLogo() {
+  await requireSession();
+  await prisma.siteSetting.update({
+    where: { id: 1 },
+    data: { logoUrl: null },
+  });
+  refreshSite();
+  revalidatePath("/admin/settings");
+}
+
+/* ---------- Messages ---------- */
+
+export async function toggleMessageRead(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const m = await prisma.contactMessage.findUnique({ where: { id } });
+  if (m) {
+    await prisma.contactMessage.update({
+      where: { id },
+      data: { read: !m.read },
+    });
+  }
+  revalidatePath("/admin/messages");
+}
+
+export async function deleteMessage(fd: FormData) {
+  await requireSession();
+  await prisma.contactMessage.delete({ where: { id: str(fd, "id") } });
+  revalidatePath("/admin/messages");
+}

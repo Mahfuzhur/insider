@@ -1,0 +1,171 @@
+import Link from "next/link";
+import Hero from "@/components/site/Hero";
+import Marquee from "@/components/site/Marquee";
+import ProjectCard from "@/components/site/ProjectCard";
+import { getFeaturedProjects, getServices, getSettings } from "@/lib/data";
+import { wordsToArray } from "@/lib/utils";
+
+export default async function HomePage() {
+  const [settings, featured, services] = await Promise.all([
+    getSettings(),
+    getFeaturedProjects(6),
+    getServices(),
+  ]);
+
+  const words = wordsToArray(settings.heroWords);
+
+  const heroImage =
+    featured[0]?.images.find((i) => i.category === "live")?.url ??
+    featured[0]?.images[0]?.url ??
+    null;
+
+  const cards = [
+    featured[0]
+      ? {
+          label: "Live photo",
+          tone: "live" as const,
+          url:
+            featured[0].images.find((i) => i.category === "live")?.url ??
+            featured[0].images[0]?.url ??
+            null,
+        }
+      : { label: "Live photo", tone: "live" as const, url: null },
+    featured[1]
+      ? {
+          label: "3D render",
+          tone: "3d" as const,
+          url:
+            featured[1].images.find((i) => i.category === "3d")?.url ??
+            featured[1].images[0]?.url ??
+            null,
+        }
+      : { label: "3D render", tone: "3d" as const, url: null },
+  ];
+
+  return (
+    <>
+      <Hero
+        heroLine={settings.heroLine}
+        words={words}
+        tagline={settings.heroTagline}
+        cards={cards}
+        heroImage={heroImage}
+      />
+
+      <Marquee
+        items={
+          services.length
+            ? services.map((s) => s.title)
+            : ["Interior design", "Space planning", "3D visualization", "Turnkey fit-out", "Styling"]
+        }
+      />
+
+      {/* Featured work */}
+      <section className="container-x py-24 md:py-32">
+        <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="eyebrow">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand" /> Selected work
+            </span>
+            <h2 className="mt-4 max-w-xl text-balance font-serif text-4xl text-cream md:text-5xl">
+              Spaces we&apos;ve shaped, room by room.
+            </h2>
+          </div>
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.12em] text-cream/70 hover:text-brand"
+          >
+            All projects <i className="ti ti-arrow-right" />
+          </Link>
+        </div>
+
+        {featured.length ? (
+          <div className="grid gap-8 md:grid-cols-2">
+            {featured.map((p) => (
+              <ProjectCard key={p.id} project={p} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-cream/50">
+            Projects added from the admin panel will appear here.
+          </p>
+        )}
+      </section>
+
+      {/* About teaser */}
+      <section className="border-y border-ink-line bg-ink-soft py-24 md:py-32">
+        <div className="container-x grid gap-12 md:grid-cols-2 md:items-center">
+          <div>
+            <span className="eyebrow">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand" /> The studio
+            </span>
+            <h2 className="mt-4 text-balance font-serif text-4xl text-cream md:text-5xl">
+              {settings.aboutTitle}
+            </h2>
+          </div>
+          <div>
+            <p className="text-lg leading-relaxed text-cream/65">
+              {settings.aboutBody}
+            </p>
+            <Link
+              href="/about"
+              className="mt-8 inline-flex items-center gap-2 text-sm uppercase tracking-[0.12em] text-brand hover:text-cream"
+            >
+              More about Insider <i className="ti ti-arrow-right" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Services preview */}
+      <section className="container-x py-24 md:py-32">
+        <span className="eyebrow">
+          <span className="h-1.5 w-1.5 rounded-full bg-brand" /> What we do
+        </span>
+        <h2 className="mt-4 mb-12 max-w-xl text-balance font-serif text-4xl text-cream md:text-5xl">
+          From first sketch to the finished room.
+        </h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {(services.length ? services : []).map((s) => (
+            <div
+              key={s.id}
+              className="rounded-2xl border border-ink-line bg-ink-card p-7 transition-colors hover:border-brand/40"
+            >
+              <i className={`ti ${s.icon} text-3xl text-brand`} />
+              <h3 className="mt-5 font-serif text-2xl text-cream">{s.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-cream/55">
+                {s.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container-x pb-28">
+        <div className="relative overflow-hidden rounded-3xl border border-brand/30 bg-gradient-to-br from-[#1c130f] to-ink px-8 py-20 text-center">
+          <div
+            className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(218,78,42,0.3), rgba(218,78,42,0) 65%)",
+            }}
+          />
+          <h2 className="relative font-serif text-4xl text-cream md:text-6xl">
+            Let&apos;s adorn your world.
+          </h2>
+          <p className="relative mx-auto mt-5 max-w-md text-cream/60">
+            Tell us about your space. We&apos;ll turn it into somewhere you never
+            want to leave.
+          </p>
+          <Link
+            href="/contact"
+            className="relative mt-9 inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-[#2a1006] transition-transform hover:scale-[1.03]"
+          >
+            Start a project <i className="ti ti-arrow-right" />
+          </Link>
+        </div>
+      </section>
+    </>
+  );
+}
