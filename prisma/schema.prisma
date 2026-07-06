@@ -73,7 +73,9 @@ model ContactMessage {
 }
 
 model SiteSetting {
-  id          Int      @id @default(1)
+  id           Int      @id @default(1)
+  brandName    String   @default("INSIDER")
+  brandTagline String   @default("Adorn Your World")
   heroLine    String   @default("Adorn your world")
   heroWords   String   @default("residences,workspaces,interiors,commercial")
   heroTagline String   @db.Text

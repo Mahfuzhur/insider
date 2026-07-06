@@ -24,17 +24,21 @@ export function Logo({
   className,
   showTagline = true,
   logoUrl,
+  name = "INSIDER",
+  tagline = "Adorn Your World",
 }: {
   className?: string;
   showTagline?: boolean;
   logoUrl?: string | null;
+  name?: string;
+  tagline?: string;
 }) {
   if (logoUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={logoUrl}
-        alt="Insider"
+        alt={name}
         className={cn("h-11 w-auto object-contain", className)}
       />
     );
@@ -43,12 +47,12 @@ export function Logo({
     <span className={cn("flex items-center gap-3", className)}>
       <LogoMark className="h-9 text-brand" />
       <span className="flex flex-col leading-none">
-        <span className="font-serif text-[22px] tracking-[0.18em] text-cream">
-          INSIDER
+        <span className="font-serif text-[22px] uppercase tracking-[0.18em] text-cream">
+          {name}
         </span>
-        {showTagline && (
+        {showTagline && tagline && (
           <span className="mt-1 text-[9px] uppercase tracking-[0.28em] text-brand/90">
-            Adorn Your World
+            {tagline}
           </span>
         )}
       </span>

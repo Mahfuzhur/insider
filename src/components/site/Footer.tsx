@@ -9,7 +9,7 @@ export default async function Footer() {
       <div className="container-x py-16">
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <Logo logoUrl={s.logoUrl} />
+            <Logo logoUrl={s.logoUrl} name={s.brandName} tagline={s.brandTagline} />
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-cream/55">
               {s.aboutBody.slice(0, 140)}…
             </p>
@@ -49,7 +49,9 @@ export default async function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-ink-line pt-6 text-xs text-cream/40 md:flex-row md:items-center">
-          <span>© {new Date().getFullYear()} Insider Limited. Adorn Your World.</span>
+          <span>
+            © {new Date().getFullYear()} Insider Limited. {s.brandTagline}.
+          </span>
           <div className="flex gap-5">
             <a href={s.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-cream">
               Facebook

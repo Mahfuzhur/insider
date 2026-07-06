@@ -20,6 +20,22 @@ export default async function SettingsPage() {
       </div>
 
       <form action={updateSettings} className="mt-6 space-y-6">
+        <Section title="Brand">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Brand name" name="brandName" defaultValue={s.brandName} />
+            <Field
+              label="Brand tagline"
+              name="brandTagline"
+              defaultValue={s.brandTagline}
+            />
+          </div>
+          <p className="text-xs text-cream/40">
+            Shown next to the logo mark in the header and footer when no logo
+            image is uploaded. The tagline also appears in the footer copyright
+            line.
+          </p>
+        </Section>
+
         <Section title="Homepage hero">
           <Field label="Hero headline" name="heroLine" defaultValue={s.heroLine} />
           <Field

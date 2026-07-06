@@ -182,6 +182,8 @@ export async function deleteService(fd: FormData) {
 export async function updateSettings(fd: FormData) {
   await requireSession();
   const data = {
+    brandName: str(fd, "brandName"),
+    brandTagline: str(fd, "brandTagline"),
     heroLine: str(fd, "heroLine"),
     heroWords: str(fd, "heroWords"),
     heroTagline: str(fd, "heroTagline"),

@@ -12,7 +12,11 @@ export default async function SiteLayout({
   return (
     <SmoothScroll>
       <div className="grain relative min-h-screen">
-        <Header logoUrl={settings.logoUrl} />
+        <Header
+          logoUrl={settings.logoUrl}
+          brandName={settings.brandName}
+          brandTagline={settings.brandTagline}
+        />
         <main>{children}</main>
         <Footer />
       </div>

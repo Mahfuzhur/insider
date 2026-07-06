@@ -2,6 +2,8 @@ import { prisma } from "./prisma";
 
 export const SETTINGS_DEFAULTS = {
   id: 1,
+  brandName: "INSIDER",
+  brandTagline: "Adorn Your World",
   heroLine: "Adorn your world",
   heroWords: "residences,workspaces,interiors,commercial",
   heroTagline:

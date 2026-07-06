@@ -12,7 +12,15 @@ const LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
-export default function Header({ logoUrl }: { logoUrl?: string | null }) {
+export default function Header({
+  logoUrl,
+  brandName,
+  brandTagline,
+}: {
+  logoUrl?: string | null;
+  brandName?: string;
+  brandTagline?: string;
+}) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -33,8 +41,8 @@ export default function Header({ logoUrl }: { logoUrl?: string | null }) {
       )}
     >
       <div className="container-x flex h-[72px] items-center justify-between">
-        <Link href="/" aria-label="Insider home">
-          <Logo logoUrl={logoUrl} />
+        <Link href="/" aria-label={`${brandName ?? "Insider"} home`}>
+          <Logo logoUrl={logoUrl} name={brandName} tagline={brandTagline} />
         </Link>
 
         <nav className="hidden items-center gap-9 md:flex">
