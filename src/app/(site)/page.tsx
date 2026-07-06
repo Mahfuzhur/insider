@@ -1,9 +1,64 @@
 import Link from "next/link";
 import Hero from "@/components/site/Hero";
+import RoomWalkHero, { type HeroRoom } from "@/components/site/RoomWalkHero";
 import Marquee from "@/components/site/Marquee";
 import ProjectCard from "@/components/site/ProjectCard";
 import { getFeaturedProjects, getServices, getSettings } from "@/lib/data";
 import { wordsToArray } from "@/lib/utils";
+
+// Walk order for the hero: the natural path through a home.
+const ROOM_ORDER = [
+  "drawing",
+  "living",
+  "dining",
+  "kitchen",
+  "master bed",
+  "bed",
+  "guest bed",
+  "kids",
+  "study",
+  "office",
+];
+
+const ROOM_LABELS: Record<string, string> = {
+  drawing: "Drawing Room",
+  living: "Living Room",
+  dining: "Dining",
+  kitchen: "Kitchen",
+  "master bed": "Master Bedroom",
+  bed: "Bedroom",
+  "guest bed": "Guest Bedroom",
+  kids: "Kids' Room",
+  study: "Study",
+  office: "Office",
+};
+
+function titleCase(s: string) {
+  return s.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** One live photo per room across featured projects, in walk order. */
+function heroRooms(
+  projects: Awaited<ReturnType<typeof getFeaturedProjects>>
+): HeroRoom[] {
+  const byRoom = new Map<string, HeroRoom>();
+  for (const p of projects) {
+    for (const img of p.images) {
+      if (img.category !== "live" || !img.alt) continue;
+      const key = img.alt.toLowerCase().replace(/[\s\d]+$/, "").trim();
+      if (!key || byRoom.has(key)) continue;
+      byRoom.set(key, { label: ROOM_LABELS[key] ?? titleCase(key), url: img.url });
+    }
+  }
+  const orderOf = (key: string) => {
+    const i = ROOM_ORDER.findIndex((t) => key.startsWith(t));
+    return i === -1 ? ROOM_ORDER.length : i;
+  };
+  return [...byRoom.entries()]
+    .sort((a, b) => orderOf(a[0]) - orderOf(b[0]))
+    .slice(0, 5)
+    .map(([, room]) => room);
+}
 
 export default async function HomePage() {
   const [settings, featured, services] = await Promise.all([
@@ -13,6 +68,7 @@ export default async function HomePage() {
   ]);
 
   const words = wordsToArray(settings.heroWords);
+  const rooms = heroRooms(featured);
 
   const heroImage =
     featured[0]?.images.find((i) => i.category === "live")?.url ??
@@ -44,13 +100,22 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero
-        heroLine={settings.heroLine}
-        words={words}
-        tagline={settings.heroTagline}
-        cards={cards}
-        heroImage={heroImage}
-      />
+      {rooms.length >= 2 ? (
+        <RoomWalkHero
+          heroLine={settings.heroLine}
+          words={words}
+          tagline={settings.heroTagline}
+          rooms={rooms}
+        />
+      ) : (
+        <Hero
+          heroLine={settings.heroLine}
+          words={words}
+          tagline={settings.heroTagline}
+          cards={cards}
+          heroImage={heroImage}
+        />
+      )}
 
       <Marquee
         items={

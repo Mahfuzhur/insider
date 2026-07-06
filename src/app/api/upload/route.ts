@@ -1,11 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
+import { mkdir } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import sharp from "sharp";
 import { prisma } from "@/lib/prisma";
 import { SESSION_COOKIE, verifySession } from "@/lib/auth";
 
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const MAX_WIDTH = 1920;
+const JPEG_QUALITY = 80;
+
+function altFromFilename(name: string) {
+  const base = name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
+  return base.length > 2 && !/^(img|image|photo|dsc|whatsapp)/i.test(base)
+    ? base
+    : null;
+}
 
 export async function POST(req: NextRequest) {
   const session = await verifySession(req.cookies.get(SESSION_COOKIE)?.value);
@@ -27,16 +37,27 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  if (file.size > 8 * 1024 * 1024) {
-    return NextResponse.json({ error: "Max file size is 8MB." }, { status: 400 });
+  if (file.size > 30 * 1024 * 1024) {
+    return NextResponse.json({ error: "Max file size is 30MB." }, { status: 400 });
   }
 
-  const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase();
-  const filename = `${randomUUID()}.${ext}`;
+  // Optimize for web: resize to max 1920px wide, re-encode as progressive JPEG.
+  const filename = `${randomUUID()}.jpg`;
   const dir = path.join(process.cwd(), "public", "uploads");
   await mkdir(dir, { recursive: true });
   const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, filename), bytes);
+  try {
+    await sharp(bytes)
+      .rotate() // respect EXIF orientation
+      .resize({ width: MAX_WIDTH, withoutEnlargement: true })
+      .jpeg({ quality: JPEG_QUALITY, progressive: true, mozjpeg: true })
+      .toFile(path.join(dir, filename));
+  } catch {
+    return NextResponse.json(
+      { error: "Could not process this image. Is the file a valid photo?" },
+      { status: 400 }
+    );
+  }
 
   const url = `/uploads/${filename}`;
   const existingCount = await prisma.projectImage.count({ where: { projectId } });
@@ -49,6 +70,7 @@ export async function POST(req: NextRequest) {
       projectId,
       url,
       category: category === "3d" ? "3d" : "live",
+      alt: altFromFilename(file.name),
       order: existingCount,
       isCover: hasCover === 0,
     },
