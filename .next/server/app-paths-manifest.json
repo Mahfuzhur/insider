@@ -1,0 +1,20 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/upload/logo/route": "app/api/upload/logo/route.js",
+  "/api/upload/route": "app/api/upload/route.js",
+  "/admin/login/page": "app/admin/login/page.js",
+  "/(site)/projects/[slug]/page": "app/(site)/projects/[slug]/page.js",
+  "/(site)/page": "app/(site)/page.js",
+  "/admin/(panel)/messages/page": "app/admin/(panel)/messages/page.js",
+  "/admin/(panel)/page": "app/admin/(panel)/page.js",
+  "/admin/(panel)/projects/[id]/page": "app/admin/(panel)/projects/[id]/page.js",
+  "/admin/(panel)/projects/new/page": "app/admin/(panel)/projects/new/page.js",
+  "/admin/(panel)/services/page": "app/admin/(panel)/services/page.js",
+  "/admin/(panel)/projects/page": "app/admin/(panel)/projects/page.js",
+  "/admin/(panel)/settings/page": "app/admin/(panel)/settings/page.js",
+  "/admin/(panel)/types/page": "app/admin/(panel)/types/page.js",
+  "/(site)/about/page": "app/(site)/about/page.js",
+  "/(site)/contact/page": "app/(site)/contact/page.js",
+  "/(site)/projects/page": "app/(site)/projects/page.js",
+  "/(site)/services/page": "app/(site)/services/page.js"
+}

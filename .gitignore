@@ -3,8 +3,8 @@
 /.pnp
 .pnp.js
 
-# next.js
-/.next/
+# next.js (build output IS committed for no-terminal cPanel deployment; cache is not)
+/.next/cache/
 /out/
 
 # production
