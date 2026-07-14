@@ -9,7 +9,9 @@
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "push:log": "prisma db push > prisma-output.txt 2>&1",
+    "debug:info": "node -e \"console.log(process.version, process.platform, process.arch)\" > debug-info.txt 2>&1 && (ldd --version >> debug-info.txt 2>&1 || true)"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
