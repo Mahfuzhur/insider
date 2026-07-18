@@ -218,12 +218,16 @@ export async function removeLogo() {
 export async function updateHeroSettings(fd: FormData) {
   await requireSession();
   const speed = Number(str(fd, "heroSpeed"));
+  const slowFps = Number(str(fd, "heroSlowFps"));
+  const fastFps = Number(str(fd, "heroFastFps"));
   await prisma.siteSetting.update({
     where: { id: 1 },
     data: {
       heroSpeed: Number.isFinite(speed) ? Math.min(12, Math.max(1.5, speed)) : 4.8,
       heroCaption: str(fd, "heroCaption"),
       heroSlowSegments: str(fd, "heroSlowSegments"),
+      heroSlowFps: Number.isFinite(slowFps) ? Math.min(24, Math.max(6, slowFps)) : 12,
+      heroFastFps: Number.isFinite(fastFps) ? Math.min(8, Math.max(1, fastFps)) : 3,
     },
   });
   refreshSite();

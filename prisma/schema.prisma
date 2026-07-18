@@ -96,6 +96,10 @@ model SiteSetting {
   // Time ranges of the walkthrough video that should play slowly on
   // scroll (one "mm.ss - mm.ss" range per line); the rest moves fast.
   heroSlowSegments String? @db.Text
+  // Conversion sampling densities: frames per video-second captured for
+  // slow segments and for the fast travel between them.
+  heroSlowFps Float @default(12)
+  heroFastFps Float @default(3)
   updatedAt   DateTime @updatedAt
 }
 

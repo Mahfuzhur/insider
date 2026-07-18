@@ -40,23 +40,32 @@ function parseSegments(text: string): [number, number][] {
 /**
  * Sample timestamps densely inside slow segments and sparsely outside, so
  * equal-scroll-per-frame playback lingers on the slow parts. Falls back to
- * uniform sampling when no segments are given.
+ * uniform sampling when no segments are given. `density` scales every rate
+ * so long videos land under MAX_FRAMES.
  */
-function buildTimestamps(duration: number, segments: [number, number][]): number[] {
-  const plan = (slowFps: number, fastFps: number) => {
-    const inSlow = (t: number) => segments.some(([a, b]) => t >= a && t <= b);
+function buildTimestamps(
+  duration: number,
+  segments: [number, number][],
+  slowFps: number,
+  fastFps: number
+): number[] {
+  const inSlow = (t: number) => segments.some(([a, b]) => t >= a && t <= b);
+  const plan = (density: number) => {
     const ts: number[] = [];
     let t = 0;
-    while (t < duration) {
+    while (t < duration && ts.length <= MAX_FRAMES * 2) {
       ts.push(t);
-      t += 1 / (segments.length ? (inSlow(t) ? slowFps : fastFps) : TARGET_FPS);
+      const fps = segments.length ? (inSlow(t) ? slowFps : fastFps) : TARGET_FPS;
+      t += 1 / (fps * density);
     }
     return ts;
   };
-  let ts = plan(SLOW_FPS, FAST_FPS);
+  let ts = plan(1);
+  if (ts.length > MAX_FRAMES) ts = plan(MAX_FRAMES / ts.length);
+  // Safety net: whatever happens above, never exceed the cap.
   if (ts.length > MAX_FRAMES) {
     const k = ts.length / MAX_FRAMES;
-    ts = plan(SLOW_FPS / k, FAST_FPS / k);
+    ts = Array.from({ length: MAX_FRAMES }, (_, i) => ts[Math.floor(i * k)]);
   }
   return ts;
 }
@@ -67,8 +76,12 @@ function buildTimestamps(duration: number, segments: [number, number][]): number
  */
 export default function HeroFilmUploader({
   slowSegments = "",
+  slowFps = SLOW_FPS,
+  fastFps = FAST_FPS,
 }: {
   slowSegments?: string;
+  slowFps?: number;
+  fastFps?: number;
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,7 +112,7 @@ export default function HeroFilmUploader({
         throw new Error("This video looks empty or unreadable.");
       }
       const segments = parseSegments(slowSegments).filter(([a]) => a < duration);
-      const timestamps = buildTimestamps(duration, segments);
+      const timestamps = buildTimestamps(duration, segments, slowFps, fastFps);
       const frameCount = timestamps.length;
       if (frameCount < 24) {
         throw new Error("This video is too short for a walkthrough film.");

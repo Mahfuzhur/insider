@@ -23,7 +23,11 @@ export default async function HeroPage() {
           video to replace it — the film is converted right here in your
           browser, so this works best on a computer.
         </p>
-        <HeroFilmUploader slowSegments={s.heroSlowSegments ?? ""} />
+        <HeroFilmUploader
+          slowSegments={s.heroSlowSegments ?? ""}
+          slowFps={s.heroSlowFps}
+          fastFps={s.heroFastFps}
+        />
       </div>
 
       <form
@@ -85,6 +89,50 @@ export default async function HeroPage() {
             numbers are seconds). These moments linger; everything between
             them rushes past. Save here first, then upload the video — the
             pacing is baked in during conversion.
+          </span>
+        </label>
+
+        <label className="mt-5 block">
+          <span className="mb-1.5 block text-xs uppercase tracking-[0.1em] text-cream/55">
+            How slow — detail in slow moments (higher = lingers longer)
+          </span>
+          <div className="flex items-center gap-4">
+            <input
+              type="range"
+              name="heroSlowFps"
+              min="6"
+              max="24"
+              step="1"
+              defaultValue={s.heroSlowFps}
+              className="w-full accent-[#da4e2a]"
+            />
+            <span className="w-12 text-right text-sm text-cream/70">
+              {s.heroSlowFps}
+            </span>
+          </div>
+        </label>
+
+        <label className="mt-5 block">
+          <span className="mb-1.5 block text-xs uppercase tracking-[0.1em] text-cream/55">
+            How fast — travel between slow moments (lower = rushes past)
+          </span>
+          <div className="flex items-center gap-4">
+            <input
+              type="range"
+              name="heroFastFps"
+              min="1"
+              max="8"
+              step="0.5"
+              defaultValue={s.heroFastFps}
+              className="w-full accent-[#da4e2a]"
+            />
+            <span className="w-12 text-right text-sm text-cream/70">
+              {s.heroFastFps}
+            </span>
+          </div>
+          <span className="mt-1 block text-xs text-cream/40">
+            These two apply at conversion time — save, then (re)upload the
+            video to hear the new rhythm.
           </span>
         </label>
 

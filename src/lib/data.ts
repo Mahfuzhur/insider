@@ -21,6 +21,8 @@ export const SETTINGS_DEFAULTS = {
   heroSpeed: 3,
   heroCaption: "The Bedroom",
   heroSlowSegments: null as string | null,
+  heroSlowFps: 12,
+  heroFastFps: 3,
 };
 
 export async function getSettings() {
