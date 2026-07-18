@@ -14,17 +14,13 @@ import {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const FRAME_COUNT = 361;
+const FRAME_COUNT = 58;
 const frameSrc = (i: number) =>
   `/hero-frames/frame-${String(i + 1).padStart(4, "0")}.webp`;
 
 /** Which walkthrough chapter a frame belongs to (for the caption). */
 const CHAPTERS: { label: string; upto: number }[] = [
   { label: "The Bedroom", upto: 58 },
-  { label: "The Return", upto: 123 },
-  { label: "The Vanity", upto: 207 },
-  { label: "The Dressing", upto: 290 },
-  { label: "The Gallery", upto: 361 },
 ];
 const chapterOf = (frame: number) =>
   CHAPTERS.findIndex((c) => frame < c.upto);
@@ -272,7 +268,7 @@ export default function VideoScrubHero({
   }
 
   return (
-    <section ref={trackRef} className="relative" style={{ height: "1100vh" }}>
+    <section ref={trackRef} className="relative" style={{ height: "280vh" }}>
       <div className="sticky top-0 h-screen overflow-hidden bg-ink">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
@@ -310,10 +306,12 @@ export default function VideoScrubHero({
               exit={{ y: -22, opacity: 0 }}
               transition={{ duration: 0.45, ease: EASE }}
             >
-              <span className="text-[11px] uppercase tracking-[0.35em] text-brand">
-                {String(active + 1).padStart(2, "0")} /{" "}
-                {String(CHAPTERS.length).padStart(2, "0")}
-              </span>
+              {CHAPTERS.length > 1 && (
+                <span className="text-[11px] uppercase tracking-[0.35em] text-brand">
+                  {String(active + 1).padStart(2, "0")} /{" "}
+                  {String(CHAPTERS.length).padStart(2, "0")}
+                </span>
+              )}
               <p className="mt-1 font-serif text-2xl italic text-cream md:text-3xl">
                 {CHAPTERS[active].label}
               </p>
