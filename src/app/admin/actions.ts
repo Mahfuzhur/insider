@@ -311,6 +311,19 @@ export async function updateReviewSettings(fd: FormData) {
   revalidatePath("/admin/review");
 }
 
+/** Point the review section at a freshly uploaded video file. */
+export async function commitReviewVideo(fd: FormData) {
+  await requireSession();
+  const url = str(fd, "url");
+  if (!url.startsWith("/uploads/review/")) throw new Error("Invalid video path.");
+  await prisma.siteSetting.update({
+    where: { id: 1 },
+    data: { reviewVideoUrl: url },
+  });
+  refreshSite();
+  revalidatePath("/admin/review");
+}
+
 /* ---------- Messages ---------- */
 
 export async function toggleMessageRead(fd: FormData) {

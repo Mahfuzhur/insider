@@ -1,6 +1,7 @@
 import { getSettings } from "@/lib/data";
 import { updateReviewSettings } from "@/app/admin/actions";
 import { parseReviewVideo } from "@/lib/utils";
+import ReviewVideoUploader from "@/components/admin/ReviewVideoUploader";
 
 export default async function ReviewPage() {
   const s = await getSettings();
@@ -36,6 +37,8 @@ export default async function ReviewPage() {
               : `Recognized as a ${embed.kind} video. ✓`}
           </span>
         </label>
+
+        <ReviewVideoUploader />
 
         <label className="mt-5 block">
           <span className="mb-1.5 block text-xs uppercase tracking-[0.1em] text-cream/55">
