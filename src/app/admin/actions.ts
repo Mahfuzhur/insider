@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { unlink } from "fs/promises";
+import path from "path";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { slugify, stringifyRooms } from "@/lib/utils";
@@ -251,6 +253,46 @@ export async function commitHeroFrames(fd: FormData) {
   });
   refreshSite();
   revalidatePath("/admin/hero");
+}
+
+/* ---------- Gallery ---------- */
+
+export async function deleteGalleryImage(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const img = await prisma.galleryImage.findUnique({ where: { id } });
+  if (img) {
+    await prisma.galleryImage.delete({ where: { id } });
+    // Best-effort removal of the file from disk.
+    if (img.url.startsWith("/uploads/gallery/")) {
+      try {
+        await unlink(path.join(process.cwd(), "public", img.url));
+      } catch {
+        /* file already gone — ignore */
+      }
+    }
+  }
+  refreshSite();
+  revalidatePath("/admin/gallery");
+}
+
+export async function moveGalleryImage(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const dir = str(fd, "dir"); // "up" | "down"
+  const all = await prisma.galleryImage.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+  });
+  const i = all.findIndex((g) => g.id === id);
+  const j = dir === "up" ? i - 1 : i + 1;
+  if (i !== -1 && j >= 0 && j < all.length) {
+    await prisma.$transaction([
+      prisma.galleryImage.update({ where: { id: all[i].id }, data: { order: j } }),
+      prisma.galleryImage.update({ where: { id: all[j].id }, data: { order: i } }),
+    ]);
+  }
+  refreshSite();
+  revalidatePath("/admin/gallery");
 }
 
 /* ---------- Messages ---------- */

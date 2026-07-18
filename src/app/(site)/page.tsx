@@ -4,7 +4,13 @@ import { type HeroRoom } from "@/components/site/RoomWalkHero";
 import VideoScrubHero from "@/components/site/VideoScrubHero";
 import Marquee from "@/components/site/Marquee";
 import ProjectCard from "@/components/site/ProjectCard";
-import { getFeaturedProjects, getServices, getSettings } from "@/lib/data";
+import ScrollGallery from "@/components/site/ScrollGallery";
+import {
+  getFeaturedProjects,
+  getGalleryImages,
+  getServices,
+  getSettings,
+} from "@/lib/data";
 import { wordsToArray } from "@/lib/utils";
 
 // Walk order for the hero: the natural path through a home.
@@ -72,10 +78,11 @@ function heroRooms(
 }
 
 export default async function HomePage() {
-  const [settings, featured, services] = await Promise.all([
+  const [settings, featured, services, gallery] = await Promise.all([
     getSettings(),
     getFeaturedProjects(6),
     getServices(),
+    getGalleryImages(),
   ]);
 
   const words = wordsToArray(settings.heroWords);
@@ -131,6 +138,8 @@ export default async function HomePage() {
           heroImage={heroImage}
         />
       )}
+
+      <ScrollGallery images={gallery} />
 
       <Marquee
         items={

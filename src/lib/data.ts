@@ -74,6 +74,12 @@ export async function getServices() {
   return prisma.service.findMany({ orderBy: { order: "asc" } });
 }
 
+export async function getGalleryImages() {
+  return prisma.galleryImage.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+  });
+}
+
 export type ProjectWithRelations = Awaited<
   ReturnType<typeof getProjects>
 >[number];

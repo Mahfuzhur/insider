@@ -103,6 +103,14 @@ model SiteSetting {
   updatedAt   DateTime @updatedAt
 }
 
+model GalleryImage {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 model AdminUser {
   id           String   @id @default(cuid())
   email        String   @unique
