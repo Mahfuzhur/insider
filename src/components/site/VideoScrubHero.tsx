@@ -134,12 +134,15 @@ export default function VideoScrubHero({
       canvas.height = h;
     }
 
-    // The full frame is always shown (contain). Any letterbox area is
-    // filled with a stretched tiny copy of the frame — a cheap blur that
-    // keeps the edges alive instead of showing dead bars.
-    const contain = Math.min(w / img.naturalWidth, h / img.naturalHeight);
-    const cover = Math.max(w / img.naturalWidth, h / img.naturalHeight);
-    if (cover / contain > 1.01) {
+    // Full width: the frame always spans the whole viewport width. It's
+    // centred vertically — cropping top/bottom if the frame is taller than
+    // the viewport, and only the (rare) short remainder gets a blurred
+    // fill so there are never dead bars.
+    const scale = w / img.naturalWidth;
+    const dw = w;
+    const dh = img.naturalHeight * scale;
+
+    if (dh < h - 1) {
       const tiny =
         backdropRef.current ?? (backdropRef.current = document.createElement("canvas"));
       const tw = 32;
@@ -155,9 +158,7 @@ export default function VideoScrubHero({
       ctx.fillRect(0, 0, w, h);
     }
 
-    const dw = img.naturalWidth * contain;
-    const dh = img.naturalHeight * contain;
-    ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    ctx.drawImage(img, 0, (h - dh) / 2, dw, dh);
   };
 
   // Two-pass preload: every 6th frame first so scrubbing works almost
@@ -325,14 +326,21 @@ export default function VideoScrubHero({
             src={frameSrc(0)}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-contain"
+            className="absolute inset-0 h-full w-full object-cover"
           />
         )}
 
-        {/* Legibility washes */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/30 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink/85 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink/70 to-transparent" />
+        {/* Legibility washes — they exist to make the headline readable, so
+            they fade out together with the headline, leaving the video
+            clean (no shadow) once the text is gone. */}
+        <motion.div
+          style={{ opacity: headOpacity }}
+          className="pointer-events-none absolute inset-0"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/30 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink/85 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink/70 to-transparent" />
+        </motion.div>
 
         {/* Headline */}
         <motion.div
@@ -345,7 +353,7 @@ export default function VideoScrubHero({
         {/* Caption */}
         {caption && (
           <div className="absolute bottom-9 left-6 z-10 md:left-12">
-            <p className="font-serif text-2xl italic text-cream md:text-3xl">
+            <p className="font-serif text-2xl italic text-cream drop-shadow-[0_1px_12px_rgba(0,0,0,0.55)] md:text-3xl">
               {caption}
             </p>
           </div>
