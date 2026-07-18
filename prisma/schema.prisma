@@ -116,6 +116,15 @@ model GalleryImage {
   createdAt DateTime @default(now())
 }
 
+model Review {
+  id        String   @id @default(cuid())
+  videoUrl  String
+  quote     String?  @db.Text
+  author    String   @default("")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 model AdminUser {
   id           String   @id @default(cuid())
   email        String   @unique

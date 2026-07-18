@@ -1,16 +1,19 @@
 import { parseReviewVideo } from "@/lib/utils";
 
-export default function ClientReview({
-  videoUrl,
-  quote,
-  author,
-}: {
+type Review = {
+  id: string;
   videoUrl: string;
   quote: string | null;
   author: string;
-}) {
-  const embed = parseReviewVideo(videoUrl);
-  if (embed.kind === "none") return null;
+};
+
+export default function ClientReview({ reviews }: { reviews: Review[] }) {
+  const valid = reviews.filter(
+    (r) => parseReviewVideo(r.videoUrl).kind !== "none"
+  );
+  if (valid.length === 0) return null;
+
+  const single = valid.length === 1;
 
   return (
     <section className="border-y border-ink-line bg-ink-soft py-24 md:py-32">
@@ -22,47 +25,84 @@ export default function ClientReview({
           What our clients say.
         </h2>
 
-        <div className="mt-12 grid gap-10 md:grid-cols-[1.4fr_1fr] md:items-center">
-          <div className="relative aspect-video overflow-hidden rounded-2xl border border-ink-line bg-ink">
-            {embed.kind === "file" ? (
-              // eslint-disable-next-line jsx-a11y/media-has-caption
-              <video
-                src={embed.src}
-                controls
-                playsInline
-                preload="metadata"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <iframe
-                src={embed.src}
-                title="Client review"
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="h-full w-full"
-              />
-            )}
-          </div>
-
-          {(quote || author) && (
-            <figure>
-              {quote && (
-                <blockquote className="font-serif text-2xl leading-snug text-cream md:text-3xl">
-                  <span className="text-brand">“</span>
-                  {quote}
-                  <span className="text-brand">”</span>
-                </blockquote>
-              )}
-              {author && (
-                <figcaption className="mt-5 text-sm uppercase tracking-[0.15em] text-cream/60">
-                  — {author}
-                </figcaption>
-              )}
-            </figure>
-          )}
+        <div
+          className={
+            "mt-12 grid gap-8 " +
+            (single ? "md:grid-cols-[1.4fr_1fr] md:items-center" : "sm:grid-cols-2")
+          }
+        >
+          {valid.map((r) => (
+            <ReviewCard key={r.id} review={r} single={single} />
+          ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function ReviewCard({ review, single }: { review: Review; single: boolean }) {
+  const embed = parseReviewVideo(review.videoUrl);
+  if (embed.kind === "none") return null;
+
+  const player = (
+    <div className="relative aspect-video overflow-hidden rounded-2xl border border-ink-line bg-ink">
+      {embed.kind === "file" ? (
+        // eslint-disable-next-line jsx-a11y/media-has-caption
+        <video
+          src={embed.src}
+          controls
+          playsInline
+          preload="metadata"
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <iframe
+          src={embed.src}
+          title={`Client review${review.author ? ` — ${review.author}` : ""}`}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="h-full w-full"
+        />
+      )}
+    </div>
+  );
+
+  const caption = (review.quote || review.author) && (
+    <figure className={single ? "" : "mt-4"}>
+      {review.quote && (
+        <blockquote
+          className={
+            "font-serif leading-snug text-cream " +
+            (single ? "text-2xl md:text-3xl" : "text-lg")
+          }
+        >
+          <span className="text-brand">“</span>
+          {review.quote}
+          <span className="text-brand">”</span>
+        </blockquote>
+      )}
+      {review.author && (
+        <figcaption className="mt-3 text-sm uppercase tracking-[0.15em] text-cream/60">
+          — {review.author}
+        </figcaption>
+      )}
+    </figure>
+  );
+
+  // In single layout the video and caption are separate grid columns.
+  if (single) {
+    return (
+      <>
+        {player}
+        {caption}
+      </>
+    );
+  }
+  return (
+    <div>
+      {player}
+      {caption}
+    </div>
   );
 }

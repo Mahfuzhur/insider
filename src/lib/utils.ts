@@ -44,7 +44,7 @@ export function wordsToArray(words: string): string[] {
 }
 
 export type ReviewEmbed =
-  | { kind: "youtube" | "vimeo"; src: string }
+  | { kind: "youtube" | "vimeo" | "facebook"; src: string }
   | { kind: "file"; src: string }
   | { kind: "none" };
 
@@ -62,6 +62,17 @@ export function parseReviewVideo(url: string): ReviewEmbed {
   const vimeo = u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
   if (vimeo) {
     return { kind: "vimeo", src: `https://player.vimeo.com/video/${vimeo[1]}` };
+  }
+
+  // Facebook videos (watch links, /videos/ID, share/v/ links, fb.watch)
+  // render through Facebook's own video plugin.
+  if (/facebook\.com\/|fb\.watch\//.test(u)) {
+    return {
+      kind: "facebook",
+      src: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(
+        u
+      )}&show_text=false&width=560`,
+    };
   }
 
   if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(u) || u.startsWith("/")) {

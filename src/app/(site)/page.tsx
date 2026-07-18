@@ -9,6 +9,7 @@ import ClientReview from "@/components/site/ClientReview";
 import {
   getFeaturedProjects,
   getGalleryImages,
+  getReviews,
   getServices,
   getSettings,
 } from "@/lib/data";
@@ -79,11 +80,12 @@ function heroRooms(
 }
 
 export default async function HomePage() {
-  const [settings, featured, services, gallery] = await Promise.all([
+  const [settings, featured, services, gallery, reviews] = await Promise.all([
     getSettings(),
     getFeaturedProjects(6),
     getServices(),
     getGalleryImages(),
+    getReviews(),
   ]);
 
   const words = wordsToArray(settings.heroWords);
@@ -142,11 +144,7 @@ export default async function HomePage() {
 
       <ScrollGallery images={gallery} />
 
-      <ClientReview
-        videoUrl={settings.reviewVideoUrl}
-        quote={settings.reviewQuote}
-        author={settings.reviewAuthor}
-      />
+      <ClientReview reviews={reviews} />
 
       <Marquee
         items={

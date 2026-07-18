@@ -6,7 +6,7 @@ import { unlink } from "fs/promises";
 import path from "path";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
-import { slugify, stringifyRooms } from "@/lib/utils";
+import { slugify, stringifyRooms, parseReviewVideo } from "@/lib/utils";
 
 function str(fd: FormData, key: string): string {
   return String(fd.get(key) ?? "").trim();
@@ -297,29 +297,83 @@ export async function moveGalleryImage(fd: FormData) {
 
 /* ---------- Client review ---------- */
 
-export async function updateReviewSettings(fd: FormData) {
+/** Add a review from a pasted link (YouTube/Vimeo/Facebook/file URL). */
+export async function createReview(fd: FormData) {
   await requireSession();
-  await prisma.siteSetting.update({
-    where: { id: 1 },
+  const videoUrl = str(fd, "videoUrl");
+  if (parseReviewVideo(videoUrl).kind === "none") {
+    throw new Error("That link isn't a recognized video URL.");
+  }
+  const count = await prisma.review.count();
+  await prisma.review.create({
     data: {
-      reviewVideoUrl: str(fd, "reviewVideoUrl"),
-      reviewQuote: str(fd, "reviewQuote"),
-      reviewAuthor: str(fd, "reviewAuthor"),
+      videoUrl,
+      quote: str(fd, "quote") || null,
+      author: str(fd, "author"),
+      order: count,
     },
   });
   refreshSite();
   revalidatePath("/admin/review");
 }
 
-/** Point the review section at a freshly uploaded video file. */
+/** Add a review from a freshly uploaded video file. */
 export async function commitReviewVideo(fd: FormData) {
   await requireSession();
   const url = str(fd, "url");
   if (!url.startsWith("/uploads/review/")) throw new Error("Invalid video path.");
-  await prisma.siteSetting.update({
-    where: { id: 1 },
-    data: { reviewVideoUrl: url },
+  const count = await prisma.review.count();
+  await prisma.review.create({
+    data: { videoUrl: url, author: "", order: count },
   });
+  refreshSite();
+  revalidatePath("/admin/review");
+}
+
+export async function updateReview(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  await prisma.review.update({
+    where: { id },
+    data: { quote: str(fd, "quote") || null, author: str(fd, "author") },
+  });
+  refreshSite();
+  revalidatePath("/admin/review");
+}
+
+export async function deleteReview(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const r = await prisma.review.findUnique({ where: { id } });
+  if (r) {
+    await prisma.review.delete({ where: { id } });
+    if (r.videoUrl.startsWith("/uploads/review/")) {
+      try {
+        await unlink(path.join(process.cwd(), "public", r.videoUrl));
+      } catch {
+        /* file already gone — ignore */
+      }
+    }
+  }
+  refreshSite();
+  revalidatePath("/admin/review");
+}
+
+export async function moveReview(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const dir = str(fd, "dir");
+  const all = await prisma.review.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+  });
+  const i = all.findIndex((r) => r.id === id);
+  const j = dir === "up" ? i - 1 : i + 1;
+  if (i !== -1 && j >= 0 && j < all.length) {
+    await prisma.$transaction([
+      prisma.review.update({ where: { id: all[i].id }, data: { order: j } }),
+      prisma.review.update({ where: { id: all[j].id }, data: { order: i } }),
+    ]);
+  }
   refreshSite();
   revalidatePath("/admin/review");
 }

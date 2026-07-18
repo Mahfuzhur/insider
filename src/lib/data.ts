@@ -83,6 +83,12 @@ export async function getGalleryImages() {
   });
 }
 
+export async function getReviews() {
+  return prisma.review.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+  });
+}
+
 export type ProjectWithRelations = Awaited<
   ReturnType<typeof getProjects>
 >[number];

@@ -44,6 +44,7 @@ export default function ReviewVideoUploader() {
       await commitReviewVideo(fd);
       setDone(true);
       router.refresh();
+      // Uploaded file becomes a new review; caller list refreshes.
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed.");
     } finally {
@@ -56,7 +57,8 @@ export default function ReviewVideoUploader() {
     <div className="mt-4 rounded-xl border border-dashed border-ink-line p-4">
       <p className="mb-3 text-xs text-cream/50">
         …or upload a video file straight from your computer (MP4, WebM or MOV,
-        up to 200MB). It becomes the review video immediately.
+        up to 200MB). It's added as a new review immediately — set its quote
+        and name below afterward.
       </p>
       <input
         ref={inputRef}
@@ -92,7 +94,7 @@ export default function ReviewVideoUploader() {
       )}
       {done && (
         <p className="mt-3 text-sm text-green-400">
-          Uploaded — this video is now live in the review section.
+          Uploaded — added as a new review below.
         </p>
       )}
       {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
