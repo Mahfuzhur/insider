@@ -37,6 +37,16 @@ function titleCase(s: string) {
   return s.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+/** Studio renders used for the hero walk until projects carry room photos. */
+const FALLBACK_ROOMS: HeroRoom[] = [
+  { label: "The Bedroom", url: "/hero/bedroom-01.jpg" },
+  { label: "The Sage Wall", url: "/hero/bedroom-02.jpg" },
+  { label: "The Vanity", url: "/hero/bedroom-03.jpg" },
+  { label: "The Dressing", url: "/hero/bedroom-04.jpg" },
+  { label: "Morning Light", url: "/hero/bedroom-05.jpg" },
+  { label: "The Gallery", url: "/hero/bedroom-06.jpg" },
+];
+
 /** One live photo per room across featured projects, in walk order. */
 function heroRooms(
   projects: Awaited<ReturnType<typeof getFeaturedProjects>>
@@ -68,7 +78,8 @@ export default async function HomePage() {
   ]);
 
   const words = wordsToArray(settings.heroWords);
-  const rooms = heroRooms(featured);
+  const dbRooms = heroRooms(featured);
+  const rooms = dbRooms.length >= 2 ? dbRooms : FALLBACK_ROOMS;
 
   const heroImage =
     featured[0]?.images.find((i) => i.category === "live")?.url ??
