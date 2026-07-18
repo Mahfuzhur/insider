@@ -223,6 +223,7 @@ export async function updateHeroSettings(fd: FormData) {
     data: {
       heroSpeed: Number.isFinite(speed) ? Math.min(12, Math.max(1.5, speed)) : 4.8,
       heroCaption: str(fd, "heroCaption"),
+      heroSlowSegments: str(fd, "heroSlowSegments"),
     },
   });
   refreshSite();

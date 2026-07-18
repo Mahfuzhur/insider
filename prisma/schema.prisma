@@ -93,6 +93,9 @@ model SiteSetting {
   heroFrameCount Int    @default(361)
   heroSpeed      Float  @default(3)
   heroCaption    String @default("The Bedroom")
+  // Time ranges of the walkthrough video that should play slowly on
+  // scroll (one "mm.ss - mm.ss" range per line); the rest moves fast.
+  heroSlowSegments String? @db.Text
   updatedAt   DateTime @updatedAt
 }
 

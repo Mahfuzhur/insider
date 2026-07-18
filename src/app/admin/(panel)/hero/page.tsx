@@ -23,7 +23,7 @@ export default async function HeroPage() {
           video to replace it — the film is converted right here in your
           browser, so this works best on a computer.
         </p>
-        <HeroFilmUploader />
+        <HeroFilmUploader slowSegments={s.heroSlowSegments ?? ""} />
       </div>
 
       <form
@@ -67,6 +67,25 @@ export default async function HeroPage() {
             defaultValue={s.heroCaption}
             className="admin-input"
           />
+        </label>
+
+        <label className="mt-5 block">
+          <span className="mb-1.5 block text-xs uppercase tracking-[0.1em] text-cream/55">
+            Slow segments — parts of the video that play slowly on scroll
+          </span>
+          <textarea
+            name="heroSlowSegments"
+            defaultValue={s.heroSlowSegments ?? ""}
+            rows={6}
+            placeholder={"04 - 12\n21 - 25\n1.21 - 1.23\n2.58 - 3.03"}
+            className="admin-input font-mono text-sm"
+          />
+          <span className="mt-1 block text-xs text-cream/40">
+            One range per line as minutes.seconds (1.21 = 1 min 21 s; plain
+            numbers are seconds). These moments linger; everything between
+            them rushes past. Save here first, then upload the video — the
+            pacing is baked in during conversion.
+          </span>
         </label>
 
         <button className="mt-6 rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]">

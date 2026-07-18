@@ -20,6 +20,7 @@ export const SETTINGS_DEFAULTS = {
   heroFrameCount: 361,
   heroSpeed: 3,
   heroCaption: "The Bedroom",
+  heroSlowSegments: null as string | null,
 };
 
 export async function getSettings() {

@@ -5,17 +5,71 @@ import { useRouter } from "next/navigation";
 import { commitHeroFrames } from "@/app/admin/actions";
 
 const TARGET_FPS = 9;
-const MAX_FRAMES = 240;
+const SLOW_FPS = 12;
+const FAST_FPS = 3;
+const MAX_FRAMES = 500;
 const FRAME_WIDTH = 1280;
 const WEBP_QUALITY = 0.68;
 
 type Phase = "idle" | "reading" | "converting" | "uploading" | "saving" | "done" | "error";
 
+/** "1.21" -> 81s (minutes.seconds); plain numbers are seconds. */
+function parseTimecode(s: string): number | null {
+  const t = s.trim();
+  if (!t) return null;
+  const m = t.match(/^(\d+)[.:](\d{1,2})$/);
+  if (m) return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  const n = Number(t);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+/** One "from - to" range per line; tolerates swapped ends. */
+function parseSegments(text: string): [number, number][] {
+  const out: [number, number][] = [];
+  for (const line of text.split(/[\n,]+/)) {
+    const ends = line.split(/[-–—]/).map(parseTimecode);
+    if (ends.length === 2 && ends[0] !== null && ends[1] !== null) {
+      const a = Math.min(ends[0], ends[1]);
+      const b = Math.max(ends[0], ends[1]);
+      if (b > a) out.push([a, b]);
+    }
+  }
+  return out.sort((x, y) => x[0] - y[0]);
+}
+
+/**
+ * Sample timestamps densely inside slow segments and sparsely outside, so
+ * equal-scroll-per-frame playback lingers on the slow parts. Falls back to
+ * uniform sampling when no segments are given.
+ */
+function buildTimestamps(duration: number, segments: [number, number][]): number[] {
+  const plan = (slowFps: number, fastFps: number) => {
+    const inSlow = (t: number) => segments.some(([a, b]) => t >= a && t <= b);
+    const ts: number[] = [];
+    let t = 0;
+    while (t < duration) {
+      ts.push(t);
+      t += 1 / (segments.length ? (inSlow(t) ? slowFps : fastFps) : TARGET_FPS);
+    }
+    return ts;
+  };
+  let ts = plan(SLOW_FPS, FAST_FPS);
+  if (ts.length > MAX_FRAMES) {
+    const k = ts.length / MAX_FRAMES;
+    ts = plan(SLOW_FPS / k, FAST_FPS / k);
+  }
+  return ts;
+}
+
 /**
  * Converts a video into a scrubbable frame sequence entirely in the
  * browser (the server can't run video tools), then uploads the frames.
  */
-export default function HeroFilmUploader() {
+export default function HeroFilmUploader({
+  slowSegments = "",
+}: {
+  slowSegments?: string;
+}) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -44,8 +98,12 @@ export default function HeroFilmUploader() {
       if (!Number.isFinite(duration) || duration < 1) {
         throw new Error("This video looks empty or unreadable.");
       }
-      const frameCount = Math.min(MAX_FRAMES, Math.max(24, Math.round(duration * TARGET_FPS)));
-      const step = duration / frameCount;
+      const segments = parseSegments(slowSegments).filter(([a]) => a < duration);
+      const timestamps = buildTimestamps(duration, segments);
+      const frameCount = timestamps.length;
+      if (frameCount < 24) {
+        throw new Error("This video is too short for a walkthrough film.");
+      }
 
       const canvas = document.createElement("canvas");
       const scale = Math.min(1, FRAME_WIDTH / video.videoWidth);
@@ -62,7 +120,7 @@ export default function HeroFilmUploader() {
         await new Promise<void>((res, rej) => {
           video.onseeked = () => res();
           video.onerror = () => rej(new Error("Seeking failed while reading the video."));
-          video.currentTime = Math.min(duration - 0.01, i * step);
+          video.currentTime = Math.min(duration - 0.01, timestamps[i]);
         });
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
