@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Hero from "@/components/site/Hero";
-import RoomWalkHero, { type HeroRoom } from "@/components/site/RoomWalkHero";
+import { type HeroRoom } from "@/components/site/RoomWalkHero";
+import RoomPanHero from "@/components/site/RoomPanHero";
 import Marquee from "@/components/site/Marquee";
 import ProjectCard from "@/components/site/ProjectCard";
 import { getFeaturedProjects, getServices, getSettings } from "@/lib/data";
@@ -112,7 +113,7 @@ export default async function HomePage() {
   return (
     <>
       {rooms.length >= 2 ? (
-        <RoomWalkHero
+        <RoomPanHero
           heroLine={settings.heroLine}
           words={words}
           tagline={settings.heroTagline}
