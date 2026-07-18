@@ -8,22 +8,23 @@ import {
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
+  useSpring,
   useTransform,
 } from "framer-motion";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const FRAME_COUNT = 180;
+const FRAME_COUNT = 361;
 const frameSrc = (i: number) =>
   `/hero-frames/frame-${String(i + 1).padStart(4, "0")}.webp`;
 
 /** Which walkthrough chapter a frame belongs to (for the caption). */
 const CHAPTERS: { label: string; upto: number }[] = [
-  { label: "The Bedroom", upto: 29 },
-  { label: "The Return", upto: 61 },
-  { label: "The Vanity", upto: 103 },
-  { label: "The Dressing", upto: 145 },
-  { label: "The Gallery", upto: 180 },
+  { label: "The Bedroom", upto: 58 },
+  { label: "The Return", upto: 123 },
+  { label: "The Vanity", upto: 207 },
+  { label: "The Dressing", upto: 290 },
+  { label: "The Gallery", upto: 361 },
 ];
 const chapterOf = (frame: number) =>
   CHAPTERS.findIndex((c) => frame < c.upto);
@@ -85,6 +86,13 @@ export default function VideoScrubHero({
   const { scrollYProgress } = useScroll({
     target: trackRef,
     offset: ["start start", "end end"],
+  });
+  // Spring-smoothed progress: the film glides between frames instead of
+  // snapping with every scroll tick.
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 55,
+    damping: 22,
+    mass: 0.4,
   });
 
   // Draw the closest loaded frame, cover-fit, at device resolution.
@@ -154,7 +162,7 @@ export default function VideoScrubHero({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
+  useMotionValueEvent(smoothProgress, "change", (v) => {
     const frame = Math.max(
       0,
       Math.min(FRAME_COUNT - 1, Math.round(v * (FRAME_COUNT - 1)))
@@ -264,7 +272,7 @@ export default function VideoScrubHero({
   }
 
   return (
-    <section ref={trackRef} className="relative" style={{ height: "900vh" }}>
+    <section ref={trackRef} className="relative" style={{ height: "1100vh" }}>
       <div className="sticky top-0 h-screen overflow-hidden bg-ink">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
