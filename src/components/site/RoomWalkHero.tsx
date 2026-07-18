@@ -238,7 +238,7 @@ export default function RoomWalkHero({
       >
         <Link
           href="/projects"
-          className="group inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-medium text-[#2a1006] transition-transform hover:scale-[1.03]"
+          className="group inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-medium text-brand-fg transition-transform hover:scale-[1.03]"
         >
           View projects{" "}
           <i className="ti ti-arrow-right transition-transform group-hover:translate-x-1" />

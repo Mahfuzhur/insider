@@ -35,7 +35,7 @@ export default async function ServicesPage() {
           defaultValue="ti-armchair"
           className="admin-input max-w-[160px]"
         />
-        <button className="shrink-0 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]">
+        <button className="shrink-0 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-brand-fg hover:scale-[1.02]">
           Add
         </button>
       </form>
@@ -69,7 +69,7 @@ export default async function ServicesPage() {
                   className="admin-input"
                 />
                 <div className="flex items-center gap-4">
-                  <button className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-[#2a1006] hover:scale-[1.02]">
+                  <button className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-fg hover:scale-[1.02]">
                     Save
                   </button>
                   <button

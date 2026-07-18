@@ -14,7 +14,7 @@ export default async function AdminProjectsPage() {
         <h1 className="font-serif text-3xl text-cream">Projects</h1>
         <Link
           href="/admin/projects/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-brand-fg hover:scale-[1.02]"
         >
           <i className="ti ti-plus" /> New project
         </Link>
@@ -60,7 +60,7 @@ export default async function AdminProjectsPage() {
                     </span>
                   )}
                   {p.featured && (
-                    <span className="absolute left-2 top-2 rounded-full bg-brand px-2 py-1 text-[10px] uppercase tracking-wide text-[#2a1006]">
+                    <span className="absolute left-2 top-2 rounded-full bg-brand px-2 py-1 text-[10px] uppercase tracking-wide text-brand-fg">
                       Featured
                     </span>
                   )}

@@ -47,7 +47,7 @@ export default async function NewProjectPage() {
           </Labeled>
           <button
             type="submit"
-            className="rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]"
+            className="rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-brand-fg hover:scale-[1.02]"
           >
             Create &amp; continue
           </button>

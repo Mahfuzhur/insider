@@ -7,6 +7,7 @@ import path from "path";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { slugify, stringifyRooms, parseReviewVideo } from "@/lib/utils";
+import { getPalette } from "@/lib/theme";
 
 function str(fd: FormData, key: string): string {
   return String(fd.get(key) ?? "").trim();
@@ -195,6 +196,7 @@ export async function updateSettings(fd: FormData) {
     phone: str(fd, "phone"),
     address: str(fd, "address"),
     facebook: str(fd, "facebook"),
+    theme: getPalette(str(fd, "theme")).id,
   };
   await prisma.siteSetting.upsert({
     where: { id: 1 },
@@ -202,6 +204,8 @@ export async function updateSettings(fd: FormData) {
     create: { id: 1, ...data },
   });
   refreshSite();
+  // The palette lives on the shared root layout, so refresh every route.
+  revalidatePath("/", "layout");
   revalidatePath("/admin/settings");
 }
 

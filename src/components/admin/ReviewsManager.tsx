@@ -71,7 +71,7 @@ export default function ReviewsManager({ reviews }: { reviews: Review[] }) {
             />
           </label>
 
-          <button className="rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]">
+          <button className="rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-brand-fg hover:scale-[1.02]">
             Add review
           </button>
         </form>
@@ -179,7 +179,7 @@ function ReviewRow({
           <form action={deleteReview}>
             <input type="hidden" name="id" value={review.id} />
             <button
-              className="rounded bg-brand/80 px-2 py-1 text-xs text-[#2a1006] hover:bg-brand"
+              className="rounded bg-brand/80 px-2 py-1 text-xs text-brand-fg hover:bg-brand"
               title="Delete"
             >
               <i className="ti ti-trash" />

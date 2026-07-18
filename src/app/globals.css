@@ -3,9 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --brand: #da4e2a;
-  --cream: #fdfeff;
-  --ink: #0b0908;
+  /* Default palette (Ember). Overridden at runtime by an inline style on
+     <body> from the admin-selected theme — see src/lib/theme.ts. Values are
+     "R G B" channels so Tailwind alpha modifiers work. */
+  --brand: 239 89 38;
+  --brand-300: 242 138 105;
+  --brand-fg: 42 16 6;
+  --ink: 11 9 8;
+  --ink-soft: 18 16 14;
+  --ink-card: 23 20 17;
+  --ink-line: 34 30 26;
+  --cream: 251 251 251;
 }
 
 @layer base {
@@ -14,14 +22,14 @@
     text-rendering: optimizeLegibility;
   }
   body {
-    background-color: var(--ink);
-    color: var(--cream);
+    background-color: rgb(var(--ink));
+    color: rgb(var(--cream));
     font-family: var(--font-sans), system-ui, sans-serif;
     overflow-x: hidden;
   }
   ::selection {
-    background: var(--brand);
-    color: #2a1006;
+    background: rgb(var(--brand));
+    color: rgb(var(--brand-fg));
   }
   h1, h2, h3, h4 {
     font-family: var(--font-serif), serif;

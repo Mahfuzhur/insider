@@ -65,7 +65,7 @@ export default function Hero({
         className="absolute inset-0 z-0"
         style={{
           background:
-            "radial-gradient(120% 95% at 72% 8%, rgba(218,78,42,0.22), rgba(11,9,8,0) 55%), #0B0908",
+            "radial-gradient(120% 95% at 72% 8%, rgb(var(--brand) / 0.22), rgb(var(--ink) / 0) 55%), rgb(var(--ink))",
         }}
       />
       <WaterHero
@@ -129,7 +129,7 @@ export default function Hero({
           >
             <Link
               href="/projects"
-              className="inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-medium text-[#2a1006] transition-transform hover:scale-[1.03]"
+              className="inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-medium text-brand-fg transition-transform hover:scale-[1.03]"
             >
               View projects <i className="ti ti-arrow-right" />
             </Link>
@@ -176,7 +176,7 @@ export default function Hero({
                 className={
                   "absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.08em] " +
                   (c.tone === "3d"
-                    ? "bg-brand text-[#2a1006]"
+                    ? "bg-brand text-brand-fg"
                     : "bg-cream/90 text-[#1c1512]")
                 }
               >

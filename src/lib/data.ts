@@ -26,6 +26,7 @@ export const SETTINGS_DEFAULTS = {
   reviewVideoUrl: "",
   reviewQuote: null as string | null,
   reviewAuthor: "",
+  theme: "ember",
 };
 
 export async function getSettings() {

@@ -35,7 +35,7 @@ export default function ProjectCard({
         <span className="absolute left-4 top-4 rounded-full bg-ink/60 px-3 py-1 text-[11px] uppercase tracking-[0.08em] text-cream backdrop-blur">
           {project.type.name}
         </span>
-        <span className="absolute bottom-4 right-4 grid h-10 w-10 translate-y-2 place-items-center rounded-full bg-brand text-[#2a1006] opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+        <span className="absolute bottom-4 right-4 grid h-10 w-10 translate-y-2 place-items-center rounded-full bg-brand text-brand-fg opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
           <i className="ti ti-arrow-up-right" />
         </span>
       </div>

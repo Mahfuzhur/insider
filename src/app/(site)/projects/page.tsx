@@ -67,7 +67,7 @@ function FilterPill({
       className={cn(
         "rounded-full border px-5 py-2 text-[13px] uppercase tracking-[0.1em] transition-colors",
         active
-          ? "border-brand bg-brand text-[#2a1006]"
+          ? "border-brand bg-brand text-brand-fg"
           : "border-ink-line text-cream/65 hover:border-cream/40 hover:text-cream"
       )}
     >

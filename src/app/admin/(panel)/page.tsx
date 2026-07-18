@@ -32,7 +32,7 @@ export default async function DashboardPage() {
         </div>
         <Link
           href="/admin/projects/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-brand-fg hover:scale-[1.02]"
         >
           <i className="ti ti-plus" /> New project
         </Link>

@@ -50,7 +50,7 @@ export default async function HeroPage() {
               max="12"
               step="0.5"
               defaultValue={s.heroSpeed}
-              className="w-full accent-[#da4e2a]"
+              className="w-full accent-brand"
             />
             <span className="w-12 text-right text-sm text-cream/70">
               {s.heroSpeed}
@@ -104,7 +104,7 @@ export default async function HeroPage() {
               max="24"
               step="1"
               defaultValue={s.heroSlowFps}
-              className="w-full accent-[#da4e2a]"
+              className="w-full accent-brand"
             />
             <span className="w-12 text-right text-sm text-cream/70">
               {s.heroSlowFps}
@@ -124,7 +124,7 @@ export default async function HeroPage() {
               max="8"
               step="0.5"
               defaultValue={s.heroFastFps}
-              className="w-full accent-[#da4e2a]"
+              className="w-full accent-brand"
             />
             <span className="w-12 text-right text-sm text-cream/70">
               {s.heroFastFps}
@@ -136,7 +136,7 @@ export default async function HeroPage() {
           </span>
         </label>
 
-        <button className="mt-6 rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]">
+        <button className="mt-6 rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-brand-fg hover:scale-[1.02]">
           Save playback settings
         </button>
       </form>

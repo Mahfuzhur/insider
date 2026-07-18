@@ -113,7 +113,7 @@ export default function GalleryManager({ images }: { images: Img[] }) {
                 <form action={deleteGalleryImage}>
                   <input type="hidden" name="id" value={im.id} />
                   <button
-                    className="rounded bg-brand/80 px-1.5 py-1 text-[10px] text-[#2a1006] hover:bg-brand"
+                    className="rounded bg-brand/80 px-1.5 py-1 text-[10px] text-brand-fg hover:bg-brand"
                     title="Delete"
                   >
                     <i className="ti ti-trash" />

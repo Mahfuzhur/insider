@@ -237,12 +237,12 @@ export default async function HomePage() {
 
       {/* CTA */}
       <section className="container-x pb-28">
-        <div className="relative overflow-hidden rounded-3xl border border-brand/30 bg-gradient-to-br from-[#1c130f] to-ink px-8 py-20 text-center">
+        <div className="relative overflow-hidden rounded-3xl border border-brand/30 bg-gradient-to-br from-ink-card to-ink px-8 py-20 text-center">
           <div
             className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full"
             style={{
               background:
-                "radial-gradient(circle, rgba(218,78,42,0.3), rgba(218,78,42,0) 65%)",
+                "radial-gradient(circle, rgb(var(--brand) / 0.3), rgb(var(--brand) / 0) 65%)",
             }}
           />
           <h2 className="relative font-serif text-4xl text-cream md:text-6xl">
@@ -254,7 +254,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/contact"
-            className="relative mt-9 inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-[#2a1006] transition-transform hover:scale-[1.03]"
+            className="relative mt-9 inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-brand-fg transition-transform hover:scale-[1.03]"
           >
             Start a project <i className="ti ti-arrow-right" />
           </Link>

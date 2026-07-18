@@ -131,7 +131,7 @@ export default async function ProjectDetailPage({
         </p>
         <Link
           href="/contact"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-medium text-[#2a1006] transition-transform hover:scale-[1.03]"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-medium text-brand-fg transition-transform hover:scale-[1.03]"
         >
           Start your project <i className="ti ti-arrow-right" />
         </Link>

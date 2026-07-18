@@ -53,7 +53,7 @@ export default function LogoUploader({ logoUrl }: { logoUrl: string | null }) {
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={busy}
-            className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-[#2a1006] hover:scale-[1.02] disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-fg hover:scale-[1.02] disabled:opacity-60"
           >
             <i className="ti ti-upload" /> {busy ? "Uploading…" : "Upload logo"}
           </button>

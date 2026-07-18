@@ -22,7 +22,7 @@ export default async function TypesPage() {
           placeholder="New category name"
           className="admin-input"
         />
-        <button className="shrink-0 rounded-lg bg-brand px-5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]">
+        <button className="shrink-0 rounded-lg bg-brand px-5 text-sm font-medium text-brand-fg hover:scale-[1.02]">
           Add
         </button>
       </form>

@@ -1,6 +1,7 @@
 import { getSettings } from "@/lib/data";
 import { updateSettings } from "@/app/admin/actions";
 import LogoUploader from "@/components/admin/LogoUploader";
+import ThemePicker from "@/components/admin/ThemePicker";
 
 export default async function SettingsPage() {
   const s = await getSettings();
@@ -36,6 +37,14 @@ export default async function SettingsPage() {
           </p>
         </Section>
 
+        <Section title="Colour theme">
+          <p className="text-xs text-cream/40">
+            Built around the logo colours. Pick a combination — it applies
+            across the whole site the moment you save.
+          </p>
+          <ThemePicker value={s.theme} />
+        </Section>
+
         <Section title="Homepage hero">
           <Field label="Hero headline" name="heroLine" defaultValue={s.heroLine} />
           <Field
@@ -60,7 +69,7 @@ export default async function SettingsPage() {
           <Field label="Facebook URL" name="facebook" defaultValue={s.facebook} />
         </Section>
 
-        <button className="rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-[#2a1006] hover:scale-[1.02]">
+        <button className="rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-brand-fg hover:scale-[1.02]">
           Save settings
         </button>
       </form>

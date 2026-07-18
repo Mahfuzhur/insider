@@ -68,7 +68,7 @@ export default function ProjectGallery({
               className={
                 "flex items-center gap-1.5 rounded-full px-4 py-2 text-xs transition-colors " +
                 (mode === "live"
-                  ? "bg-brand text-[#2a1006]"
+                  ? "bg-brand text-brand-fg"
                   : "text-cream/70 hover:text-cream")
               }
             >
@@ -82,7 +82,7 @@ export default function ProjectGallery({
               className={
                 "flex items-center gap-1.5 rounded-full px-4 py-2 text-xs transition-colors " +
                 (mode === "3d"
-                  ? "bg-brand text-[#2a1006]"
+                  ? "bg-brand text-brand-fg"
                   : "text-cream/70 hover:text-cream")
               }
             >

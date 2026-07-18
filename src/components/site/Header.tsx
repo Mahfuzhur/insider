@@ -57,7 +57,7 @@ export default function Header({
           ))}
           <Link
             href="/contact"
-            className="rounded-full border border-cream/25 px-5 py-2 text-[12px] uppercase tracking-[0.12em] text-cream transition-colors hover:border-brand hover:bg-brand hover:text-[#2a1006]"
+            className="rounded-full border border-cream/25 px-5 py-2 text-[12px] uppercase tracking-[0.12em] text-cream transition-colors hover:border-brand hover:bg-brand hover:text-brand-fg"
           >
             Let&apos;s talk
           </Link>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+import { getSettings } from "@/lib/data";
+import { paletteStyle } from "@/lib/theme";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -26,9 +28,12 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://insiderltd.com"),
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const settings = await getSettings();
+  const themeVars = paletteStyle(settings.theme);
+
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable}`}>
       <head>
@@ -37,7 +42,7 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css"
         />
       </head>
-      <body>{children}</body>
+      <body style={themeVars as React.CSSProperties}>{children}</body>
     </html>
   );
 }

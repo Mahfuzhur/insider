@@ -126,7 +126,7 @@ function Bucket({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={im.url} alt="" className="h-full w-full object-cover" />
               {im.isCover && (
-                <span className="absolute left-1 top-1 rounded bg-brand px-1.5 py-0.5 text-[9px] uppercase text-[#2a1006]">
+                <span className="absolute left-1 top-1 rounded bg-brand px-1.5 py-0.5 text-[9px] uppercase text-brand-fg">
                   Cover
                 </span>
               )}
@@ -145,7 +145,7 @@ function Bucket({
                   <input type="hidden" name="id" value={im.id} />
                   <input type="hidden" name="projectId" value={projectId} />
                   <button
-                    className="rounded bg-brand/80 px-1.5 py-1 text-[10px] text-[#2a1006] hover:bg-brand"
+                    className="rounded bg-brand/80 px-1.5 py-1 text-[10px] text-brand-fg hover:bg-brand"
                     title="Delete"
                   >
                     <i className="ti ti-trash" />

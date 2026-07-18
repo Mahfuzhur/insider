@@ -47,7 +47,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-[#2a1006] transition-transform hover:scale-[1.03] disabled:opacity-60"
+        className="inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-brand-fg transition-transform hover:scale-[1.03] disabled:opacity-60"
       >
         {pending ? "Sending…" : "Send message"}
         {!pending && <i className="ti ti-arrow-right" />}

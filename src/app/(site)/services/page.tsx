@@ -60,7 +60,7 @@ export default async function ServicesPage() {
         </h2>
         <Link
           href="/contact"
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-[#2a1006] transition-transform hover:scale-[1.03]"
+          className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-brand-fg transition-transform hover:scale-[1.03]"
         >
           Get a quote <i className="ti ti-arrow-right" />
         </Link>

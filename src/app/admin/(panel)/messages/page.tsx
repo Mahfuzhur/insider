@@ -34,7 +34,7 @@ export default async function MessagesPage() {
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-cream">{m.name}</span>
                   {!m.read && (
-                    <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] uppercase text-[#2a1006]">
+                    <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] uppercase text-brand-fg">
                       New
                     </span>
                   )}

@@ -7,26 +7,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // All driven by CSS variables (see globals.css / src/lib/theme.ts)
+        // so the palette can be swapped at runtime from the admin panel.
         brand: {
-          DEFAULT: "#DA4E2A",
-          50: "#FBEDE8",
-          100: "#F4CBBC",
-          200: "#EDA88F",
-          300: "#E68463",
-          400: "#DF6136",
-          500: "#DA4E2A",
-          600: "#B23E20",
-          700: "#892F18",
-          800: "#5F2010",
-          900: "#361208",
+          DEFAULT: "rgb(var(--brand) / <alpha-value>)",
+          300: "rgb(var(--brand-300) / <alpha-value>)",
+          fg: "rgb(var(--brand-fg) / <alpha-value>)",
         },
         ink: {
-          DEFAULT: "#0B0908",
-          soft: "#12100E",
-          card: "#171411",
-          line: "#221E1A",
+          DEFAULT: "rgb(var(--ink) / <alpha-value>)",
+          soft: "rgb(var(--ink-soft) / <alpha-value>)",
+          card: "rgb(var(--ink-card) / <alpha-value>)",
+          line: "rgb(var(--ink-line) / <alpha-value>)",
         },
-        cream: "#FDFEFF",
+        cream: "rgb(var(--cream) / <alpha-value>)",
       },
       fontFamily: {
         serif: ["var(--font-serif)", "Cormorant Garamond", "serif"],

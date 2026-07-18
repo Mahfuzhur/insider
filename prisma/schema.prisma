@@ -105,6 +105,8 @@ model SiteSetting {
   reviewVideoUrl String  @default("")
   reviewQuote    String? @db.Text
   reviewAuthor   String  @default("")
+  // Selected colour palette id (see src/lib/theme.ts).
+  theme       String   @default("ember")
   updatedAt   DateTime @updatedAt
 }
 

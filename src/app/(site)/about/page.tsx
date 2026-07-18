@@ -65,7 +65,7 @@ export default async function AboutPage() {
         <div className="mt-14 text-center">
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-[#2a1006] transition-transform hover:scale-[1.03]"
+            className="inline-flex items-center gap-2 rounded-full bg-brand px-8 py-4 text-sm font-medium text-brand-fg transition-transform hover:scale-[1.03]"
           >
             Work with us <i className="ti ti-arrow-right" />
           </Link>
