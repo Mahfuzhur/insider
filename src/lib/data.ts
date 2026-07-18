@@ -18,7 +18,7 @@ export const SETTINGS_DEFAULTS = {
   logoUrl: null as string | null,
   heroFrameDir: "/hero-frames",
   heroFrameCount: 361,
-  heroSpeed: 3,
+  heroSpeed: 2,
   heroCaption: "The Bedroom",
   heroSlowSegments: null as string | null,
   heroSlowFps: 12,
