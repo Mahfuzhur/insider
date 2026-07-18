@@ -3,27 +3,18 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
-  AnimatePresence,
   motion,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
+  AnimatePresence,
 } from "framer-motion";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const FRAME_COUNT = 58;
-const frameSrc = (i: number) =>
-  `/hero-frames/frame-${String(i + 1).padStart(4, "0")}.webp`;
-
-/** Which walkthrough chapter a frame belongs to (for the caption). */
-const CHAPTERS: { label: string; upto: number }[] = [
-  { label: "The Bedroom", upto: 58 },
-];
-const chapterOf = (frame: number) =>
-  CHAPTERS.findIndex((c) => frame < c.upto);
+const pad4 = (n: number) => String(n).padStart(4, "0");
 
 /** Rotating brand word, revealed letter by letter. */
 function KineticWord({ word }: { word: string }) {
@@ -54,7 +45,7 @@ function KineticWord({ word }: { word: string }) {
             }}
             className="inline-block will-change-transform"
           >
-            {ch === " " ? " " : ch}
+            {ch === " " ? " " : ch}
           </motion.span>
         ))}
       </motion.span>
@@ -66,23 +57,36 @@ export default function VideoScrubHero({
   heroLine,
   words,
   tagline,
+  frameDir,
+  frameCount,
+  speed,
+  caption,
 }: {
   heroLine: string;
   words: string[];
   tagline: string;
+  /** Public path holding frame-0001.webp … frame-NNNN.webp */
+  frameDir: string;
+  frameCount: number;
+  /** vh of scroll per frame — higher is slower playback. */
+  speed: number;
+  caption: string;
 }) {
+  const frameSrc = (i: number) => `${frameDir}/frame-${pad4(i + 1)}.webp`;
+  const trackHeight = Math.max(150, Math.round(frameCount * speed));
+
   const trackRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
   const currentFrame = useRef(0);
   const reduced = useReducedMotion();
   const [coarseReady, setCoarseReady] = useState(false);
-  const [active, setActive] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: trackRef,
     offset: ["start start", "end end"],
   });
+
   // Spring-smoothed progress: the film glides between frames instead of
   // snapping with every scroll tick.
   const smoothProgress = useSpring(scrollYProgress, {
@@ -117,11 +121,11 @@ export default function VideoScrubHero({
     if (!canvas || !ctx) return;
 
     let img: HTMLImageElement | null = null;
-    for (let d = 0; d < FRAME_COUNT; d++) {
+    for (let d = 0; d < frameCount; d++) {
       const lo = frame - d;
       const hi = frame + d;
       if (lo >= 0 && imagesRef.current[lo]?.complete) { img = imagesRef.current[lo]; break; }
-      if (hi < FRAME_COUNT && imagesRef.current[hi]?.complete) { img = imagesRef.current[hi]; break; }
+      if (hi < frameCount && imagesRef.current[hi]?.complete) { img = imagesRef.current[hi]; break; }
     }
     if (!img) return;
 
@@ -142,6 +146,9 @@ export default function VideoScrubHero({
   // immediately, then the rest fill in.
   useEffect(() => {
     let cancelled = false;
+    imagesRef.current = [];
+    setCoarseReady(false);
+
     const load = (i: number, onload?: () => void) => {
       const img = new Image();
       img.src = frameSrc(i);
@@ -154,15 +161,15 @@ export default function VideoScrubHero({
     };
 
     let coarse = 0;
-    const coarseTotal = Math.ceil(FRAME_COUNT / 6);
-    for (let i = 0; i < FRAME_COUNT; i += 6) {
+    const coarseTotal = Math.ceil(frameCount / 6);
+    for (let i = 0; i < frameCount; i += 6) {
       load(i, () => {
         coarse++;
         if (coarse >= coarseTotal) setCoarseReady(true);
       });
     }
     const t = setTimeout(() => {
-      for (let i = 0; i < FRAME_COUNT; i++) {
+      for (let i = 0; i < frameCount; i++) {
         if (!imagesRef.current[i]) load(i);
       }
     }, 800);
@@ -175,19 +182,17 @@ export default function VideoScrubHero({
       window.removeEventListener("resize", onResize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [frameDir, frameCount]);
 
   useMotionValueEvent(smoothProgress, "change", (v) => {
     const frame = Math.max(
       0,
-      Math.min(FRAME_COUNT - 1, Math.round(v * (FRAME_COUNT - 1)))
+      Math.min(frameCount - 1, Math.round(v * (frameCount - 1)))
     );
     if (frame !== currentFrame.current) {
       currentFrame.current = frame;
       requestAnimationFrame(() => draw(frame));
     }
-    const ch = chapterOf(frame);
-    if (ch !== -1 && ch !== active) setActive(ch);
   });
 
   const [wi, setWi] = useState(0);
@@ -277,7 +282,7 @@ export default function VideoScrubHero({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={frameSrc(0)}
-          alt="Bedroom interior"
+          alt="Interior walkthrough"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/50 to-ink/20" />
@@ -287,7 +292,11 @@ export default function VideoScrubHero({
   }
 
   return (
-    <section ref={trackRef} className="relative" style={{ height: "280vh" }}>
+    <section
+      ref={trackRef}
+      className="relative"
+      style={{ height: `${trackHeight}vh` }}
+    >
       <div className="sticky top-0 h-screen overflow-hidden bg-ink">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
@@ -315,28 +324,14 @@ export default function VideoScrubHero({
           <div className="pointer-events-auto max-w-3xl">{heading}</div>
         </motion.div>
 
-        {/* Chapter caption */}
-        <div className="absolute bottom-9 left-6 z-10 md:left-12">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active}
-              initial={{ y: 22, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -22, opacity: 0 }}
-              transition={{ duration: 0.45, ease: EASE }}
-            >
-              {CHAPTERS.length > 1 && (
-                <span className="text-[11px] uppercase tracking-[0.35em] text-brand">
-                  {String(active + 1).padStart(2, "0")} /{" "}
-                  {String(CHAPTERS.length).padStart(2, "0")}
-                </span>
-              )}
-              <p className="mt-1 font-serif text-2xl italic text-cream md:text-3xl">
-                {CHAPTERS[active].label}
-              </p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        {/* Caption */}
+        {caption && (
+          <div className="absolute bottom-9 left-6 z-10 md:left-12">
+            <p className="font-serif text-2xl italic text-cream md:text-3xl">
+              {caption}
+            </p>
+          </div>
+        )}
 
         {/* Scroll hint — fades once the film starts */}
         <motion.div

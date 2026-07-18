@@ -87,6 +87,12 @@ model SiteSetting {
   address     String   @default("House 07, Road 1/C, Block L, Banani Chairman Bari, Dhaka-1212")
   facebook    String   @default("https://www.facebook.com/insiderltd")
   logoUrl     String?
+  // Scroll-scrubbed hero film: where its frames live, how many there are,
+  // scroll length per frame (vh), and the on-screen caption.
+  heroFrameDir   String @default("/hero-frames")
+  heroFrameCount Int    @default(361)
+  heroSpeed      Float  @default(3)
+  heroCaption    String @default("The Bedroom")
   updatedAt   DateTime @updatedAt
 }
 

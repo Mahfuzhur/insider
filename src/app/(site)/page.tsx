@@ -117,6 +117,10 @@ export default async function HomePage() {
           heroLine={settings.heroLine}
           words={words}
           tagline={settings.heroTagline}
+          frameDir={settings.heroFrameDir}
+          frameCount={settings.heroFrameCount}
+          speed={settings.heroSpeed}
+          caption={settings.heroCaption}
         />
       ) : (
         <Hero

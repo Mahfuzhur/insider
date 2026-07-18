@@ -213,6 +213,41 @@ export async function removeLogo() {
   revalidatePath("/admin/settings");
 }
 
+/* ---------- Hero film ---------- */
+
+export async function updateHeroSettings(fd: FormData) {
+  await requireSession();
+  const speed = Number(str(fd, "heroSpeed"));
+  await prisma.siteSetting.update({
+    where: { id: 1 },
+    data: {
+      heroSpeed: Number.isFinite(speed) ? Math.min(12, Math.max(1.5, speed)) : 4.8,
+      heroCaption: str(fd, "heroCaption"),
+    },
+  });
+  refreshSite();
+  revalidatePath("/admin/hero");
+}
+
+/** Point the hero at a freshly uploaded frame set. */
+export async function commitHeroFrames(fd: FormData) {
+  await requireSession();
+  const setId = str(fd, "setId");
+  const count = num(fd, "count");
+  if (!/^[a-f0-9-]{8,40}$/.test(setId) || !count || count < 10 || count > 1000) {
+    throw new Error("Invalid frame set.");
+  }
+  await prisma.siteSetting.update({
+    where: { id: 1 },
+    data: {
+      heroFrameDir: `/uploads/hero/${setId}`,
+      heroFrameCount: count,
+    },
+  });
+  refreshSite();
+  revalidatePath("/admin/hero");
+}
+
 /* ---------- Messages ---------- */
 
 export async function toggleMessageRead(fd: FormData) {

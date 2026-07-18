@@ -16,6 +16,10 @@ export const SETTINGS_DEFAULTS = {
   address: "House 07, Road 1/C, Block L, Banani Chairman Bari, Dhaka-1212",
   facebook: "https://www.facebook.com/insiderltd",
   logoUrl: null as string | null,
+  heroFrameDir: "/hero-frames",
+  heroFrameCount: 361,
+  heroSpeed: 3,
+  heroCaption: "The Bedroom",
 };
 
 export async function getSettings() {

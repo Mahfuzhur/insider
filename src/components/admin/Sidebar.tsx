@@ -11,6 +11,7 @@ const NAV = [
   { href: "/admin/projects", label: "Projects", icon: "ti-photo" },
   { href: "/admin/types", label: "Categories", icon: "ti-category" },
   { href: "/admin/services", label: "Services", icon: "ti-tools" },
+  { href: "/admin/hero", label: "Hero video", icon: "ti-video" },
   { href: "/admin/messages", label: "Messages", icon: "ti-mail" },
   { href: "/admin/settings", label: "Settings", icon: "ti-settings" },
 ];
