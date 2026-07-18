@@ -77,6 +77,7 @@ export default function VideoScrubHero({
 
   const trackRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const backdropRef = useRef<HTMLCanvasElement | null>(null);
   const imagesRef = useRef<(HTMLImageElement | null)[]>([]);
   const currentFrame = useRef(0);
   const reduced = useReducedMotion();
@@ -132,9 +133,30 @@ export default function VideoScrubHero({
       canvas.width = w;
       canvas.height = h;
     }
-    const s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
-    const dw = img.naturalWidth * s;
-    const dh = img.naturalHeight * s;
+
+    // The full frame is always shown (contain). Any letterbox area is
+    // filled with a stretched tiny copy of the frame — a cheap blur that
+    // keeps the edges alive instead of showing dead bars.
+    const contain = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+    const cover = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+    if (cover / contain > 1.01) {
+      const tiny =
+        backdropRef.current ?? (backdropRef.current = document.createElement("canvas"));
+      const tw = 32;
+      const th = Math.max(1, Math.round((32 * img.naturalHeight) / img.naturalWidth));
+      if (tiny.width !== tw || tiny.height !== th) {
+        tiny.width = tw;
+        tiny.height = th;
+      }
+      tiny.getContext("2d")?.drawImage(img, 0, 0, tw, th);
+      const bs = Math.max(w / tw, h / th);
+      ctx.drawImage(tiny, (w - tw * bs) / 2, (h - th * bs) / 2, tw * bs, th * bs);
+      ctx.fillStyle = "rgba(10, 8, 6, 0.55)";
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    const dw = img.naturalWidth * contain;
+    const dh = img.naturalHeight * contain;
     ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
   };
 
@@ -303,7 +325,7 @@ export default function VideoScrubHero({
             src={frameSrc(0)}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-contain"
           />
         )}
 
