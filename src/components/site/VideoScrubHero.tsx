@@ -91,6 +91,25 @@ export default function VideoScrubHero({
     mass: 0.4,
   });
 
+  // On reload the browser restores the previous scroll position. Snap the
+  // spring there instantly so the film doesn't auto-play from frame 0 to
+  // the restored spot.
+  const springSynced = useRef(false);
+  useEffect(() => {
+    const v = scrollYProgress.get();
+    if (v > 0) {
+      springSynced.current = true;
+      smoothProgress.jump(v);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    if (!springSynced.current) {
+      springSynced.current = true;
+      smoothProgress.jump(v);
+    }
+  });
+
   // Draw the closest loaded frame, cover-fit, at device resolution.
   const draw = (frame: number) => {
     const canvas = canvasRef.current;
