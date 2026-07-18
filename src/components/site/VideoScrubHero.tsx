@@ -264,7 +264,7 @@ export default function VideoScrubHero({
   }
 
   return (
-    <section ref={trackRef} className="relative" style={{ height: "650vh" }}>
+    <section ref={trackRef} className="relative" style={{ height: "900vh" }}>
       <div className="sticky top-0 h-screen overflow-hidden bg-ink">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
