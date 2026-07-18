@@ -295,6 +295,22 @@ export async function moveGalleryImage(fd: FormData) {
   revalidatePath("/admin/gallery");
 }
 
+/* ---------- Client review ---------- */
+
+export async function updateReviewSettings(fd: FormData) {
+  await requireSession();
+  await prisma.siteSetting.update({
+    where: { id: 1 },
+    data: {
+      reviewVideoUrl: str(fd, "reviewVideoUrl"),
+      reviewQuote: str(fd, "reviewQuote"),
+      reviewAuthor: str(fd, "reviewAuthor"),
+    },
+  });
+  refreshSite();
+  revalidatePath("/admin/review");
+}
+
 /* ---------- Messages ---------- */
 
 export async function toggleMessageRead(fd: FormData) {

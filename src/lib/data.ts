@@ -23,6 +23,9 @@ export const SETTINGS_DEFAULTS = {
   heroSlowSegments: null as string | null,
   heroSlowFps: 12,
   heroFastFps: 3,
+  reviewVideoUrl: "",
+  reviewQuote: null as string | null,
+  reviewAuthor: "",
 };
 
 export async function getSettings() {

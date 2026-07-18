@@ -100,6 +100,11 @@ model SiteSetting {
   // slow segments and for the fast travel between them.
   heroSlowFps Float @default(12)
   heroFastFps Float @default(3)
+  // Client review video: a YouTube/Vimeo link or a direct video file URL,
+  // with an optional pull-quote and attribution.
+  reviewVideoUrl String  @default("")
+  reviewQuote    String? @db.Text
+  reviewAuthor   String  @default("")
   updatedAt   DateTime @updatedAt
 }
 

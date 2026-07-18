@@ -5,6 +5,7 @@ import VideoScrubHero from "@/components/site/VideoScrubHero";
 import Marquee from "@/components/site/Marquee";
 import ProjectCard from "@/components/site/ProjectCard";
 import ScrollGallery from "@/components/site/ScrollGallery";
+import ClientReview from "@/components/site/ClientReview";
 import {
   getFeaturedProjects,
   getGalleryImages,
@@ -140,6 +141,12 @@ export default async function HomePage() {
       )}
 
       <ScrollGallery images={gallery} />
+
+      <ClientReview
+        videoUrl={settings.reviewVideoUrl}
+        quote={settings.reviewQuote}
+        author={settings.reviewAuthor}
+      />
 
       <Marquee
         items={

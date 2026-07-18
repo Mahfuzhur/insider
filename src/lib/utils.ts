@@ -42,3 +42,31 @@ export function wordsToArray(words: string): string[] {
     .map((w) => w.trim())
     .filter(Boolean);
 }
+
+export type ReviewEmbed =
+  | { kind: "youtube" | "vimeo"; src: string }
+  | { kind: "file"; src: string }
+  | { kind: "none" };
+
+/** Turn a pasted review link into something we can render. */
+export function parseReviewVideo(url: string): ReviewEmbed {
+  const u = (url ?? "").trim();
+  if (!u) return { kind: "none" };
+
+  const yt =
+    u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
+  if (yt) {
+    return { kind: "youtube", src: `https://www.youtube.com/embed/${yt[1]}` };
+  }
+
+  const vimeo = u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if (vimeo) {
+    return { kind: "vimeo", src: `https://player.vimeo.com/video/${vimeo[1]}` };
+  }
+
+  if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(u) || u.startsWith("/")) {
+    return { kind: "file", src: u };
+  }
+
+  return { kind: "none" };
+}
