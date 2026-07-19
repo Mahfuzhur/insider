@@ -5,6 +5,7 @@ import { LogoMark } from "@/components/Logo";
 import { useEffect, useRef, useState } from "react";
 import {
   motion,
+  useMotionTemplate,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -64,7 +65,7 @@ export default function VideoScrubHero({
   caption,
   logoUrl,
   brandName,
-  introTagline,
+  brandTagline,
 }: {
   heroLine: string;
   words: string[];
@@ -77,15 +78,20 @@ export default function VideoScrubHero({
   caption: string;
   logoUrl: string | null;
   brandName: string;
-  introTagline: string;
+  brandTagline: string;
 }) {
   const frameSrc = (i: number) => `${frameDir}/frame-${pad4(i + 1)}.webp`;
-  // The walk gets one screen of scroll up front for the logo reveal, then
-  // its own run for the film — so the intro doesn't eat film frames.
-  const INTRO_VH = 100;
+  // The film plays across the first stretch of scroll; a final screen is
+  // reserved so the logo can zoom hazy→clear as the walk ends, then fade
+  // into the gallery below.
+  const OUTRO_VH = 130;
   const filmVh = Math.max(150, Math.round(frameCount * speed));
-  const trackHeight = INTRO_VH + filmVh;
-  const introFrac = INTRO_VH / trackHeight;
+  const trackHeight = filmVh + OUTRO_VH;
+  const filmFrac = filmVh / trackHeight;
+  // Logo outro window (fractions of the whole track).
+  const outroStart = filmFrac * 0.88; // logo begins while the video finishes
+  const outroClear = Math.min(0.97, filmFrac + (1 - filmFrac) * 0.55);
+  const outroFade = Math.min(0.99, filmFrac + (1 - filmFrac) * 0.8);
 
   const trackRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -215,8 +221,8 @@ export default function VideoScrubHero({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [frameDir, frameCount]);
 
-  // Film advances only across the post-intro portion of the scroll.
-  const filmProgress = useTransform(smoothProgress, [introFrac, 1], [0, 1], {
+  // Film advances across the pre-outro portion of the scroll.
+  const filmProgress = useTransform(smoothProgress, [0, filmFrac], [0, 1], {
     clamp: true,
   });
   useMotionValueEvent(filmProgress, "change", (v) => {
@@ -237,28 +243,41 @@ export default function VideoScrubHero({
     return () => clearInterval(t);
   }, [words.length]);
 
-  // Logo intro: an opaque branded splash that grows on load, then fades and
-  // scales away as the first screen is scrolled — revealing the walkthrough.
-  const introOpacity = useTransform(scrollYProgress, [0, introFrac * 0.85], [1, 0]);
-  const introScale = useTransform(scrollYProgress, [0, introFrac], [1, 1.18]);
-  const introHintOpacity = useTransform(
+  // Logo outro: as the walk ends, an ink scrim fades in over the last frames
+  // and the logo zooms from small+hazy to large+clear, then the whole thing
+  // fades away into the gallery below.
+  const outroScrim = useTransform(scrollYProgress, [outroStart, outroClear], [0, 1], {
+    clamp: true,
+  });
+  const outroLogoOpacity = useTransform(
     scrollYProgress,
-    [0, introFrac * 0.5],
-    [1, 0]
+    [outroStart, outroClear],
+    [0, 1],
+    { clamp: true }
+  );
+  const outroLogoScale = useTransform(
+    scrollYProgress,
+    [outroStart, outroClear],
+    [0.4, 1.08],
+    { clamp: true }
+  );
+  const outroBlurPx = useTransform(
+    scrollYProgress,
+    [outroStart, outroClear],
+    [16, 0],
+    { clamp: true }
+  );
+  const outroLogoFilter = useMotionTemplate`blur(${outroBlurPx}px)`;
+  const outroContainerOpacity = useTransform(
+    scrollYProgress,
+    [outroFade, 1],
+    [1, 0],
+    { clamp: true }
   );
 
-  // Headline hands the stage to the film once the scrub begins — but only
-  // after the intro has cleared.
-  const headY = useTransform(
-    scrollYProgress,
-    [introFrac, introFrac + 0.16],
-    ["0%", "-6%"]
-  );
-  const headOpacity = useTransform(
-    scrollYProgress,
-    [introFrac, introFrac + 0.1, introFrac + 0.18],
-    [1, 1, 0]
-  );
+  // Headline hands the stage to the film once the scrub begins.
+  const headY = useTransform(scrollYProgress, [0, 0.16], ["0%", "-6%"]);
+  const headOpacity = useTransform(scrollYProgress, [0, 0.12, 0.2], [1, 1, 0]);
 
   const firstLineWords = (
     heroLine.split(" ").slice(0, -1).join(" ") || heroLine
@@ -397,11 +416,7 @@ export default function VideoScrubHero({
         {/* Scroll hint — fades once the film starts */}
         <motion.div
           style={{
-            opacity: useTransform(
-              scrollYProgress,
-              [introFrac, introFrac + 0.05],
-              [1, 0]
-            ),
+            opacity: useTransform(scrollYProgress, [0, 0.05], [1, 0]),
           }}
           className="absolute bottom-9 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-3 text-cream/60 sm:flex"
         >
@@ -417,54 +432,46 @@ export default function VideoScrubHero({
           className="absolute inset-x-0 bottom-0 z-10 h-[2px] origin-left bg-brand"
         />
 
-        {/* Logo intro — grows on load, then dissolves as you scroll down */}
+        {/* Logo outro — as the walk ends, the logo zooms hazy→clear over a
+            darkening scrim, then the whole layer fades into the gallery. */}
         <motion.div
-          style={{ opacity: introOpacity }}
-          className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center bg-ink"
+          style={{ opacity: outroContainerOpacity }}
+          className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center"
         >
+          {/* Scrim that fades in over the last frames */}
           <motion.div
-            style={{ scale: introScale }}
-            className="flex flex-col items-center"
-          >
-            <motion.div
-              initial={{ scale: 0.32, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.5, ease: EASE }}
-              className="flex flex-col items-center will-change-transform"
-            >
-              {logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={logoUrl}
-                  alt={brandName}
-                  className="h-24 w-auto object-contain md:h-32"
-                />
-              ) : (
-                <>
-                  <LogoMark className="h-24 text-brand md:h-32" />
-                  <span className="mt-5 font-serif text-3xl uppercase tracking-[0.22em] text-cream md:text-4xl">
-                    {brandName}
-                  </span>
-                </>
-              )}
-            </motion.div>
-
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.75, ease: EASE }}
-              className="mt-6 text-center text-sm uppercase tracking-[0.32em] text-brand md:text-base"
-            >
-              {introTagline}
-            </motion.p>
-          </motion.div>
+            style={{ opacity: outroScrim }}
+            className="absolute inset-0 bg-ink"
+          />
 
           <motion.div
-            style={{ opacity: introHintOpacity }}
-            className="absolute bottom-10 flex flex-col items-center gap-2 text-cream/50"
+            style={{
+              opacity: outroLogoOpacity,
+              scale: outroLogoScale,
+              filter: outroLogoFilter,
+            }}
+            className="relative flex flex-col items-center will-change-transform"
           >
-            <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-            <i className="ti ti-chevron-down animate-bounce text-lg" />
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt={brandName}
+                className="h-28 w-auto object-contain md:h-44"
+              />
+            ) : (
+              <>
+                <LogoMark className="h-28 text-brand md:h-44" />
+                <span className="mt-5 font-serif text-3xl uppercase tracking-[0.22em] text-cream md:text-5xl">
+                  {brandName}
+                </span>
+              </>
+            )}
+            {brandTagline && (
+              <span className="mt-6 text-center text-sm uppercase tracking-[0.32em] text-brand md:text-base">
+                {brandTagline}
+              </span>
+            )}
           </motion.div>
         </motion.div>
       </div>

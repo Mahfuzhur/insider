@@ -133,7 +133,7 @@ export default async function HomePage() {
           caption={settings.heroCaption}
           logoUrl={settings.logoUrl}
           brandName={settings.brandName}
-          introTagline={settings.brandTagline}
+          brandTagline={settings.brandTagline}
         />
       ) : (
         <Hero
