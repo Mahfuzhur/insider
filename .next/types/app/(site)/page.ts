@@ -1,4 +1,4 @@
-// File: C:\Users\Mahfuzhur\AppData\Local\Temp\claude\C--amazon-belleron-wallet-ai-image\224b66c2-3c4b-4d24-863f-51a64b228afd\scratchpad\insider\src\app\(site)\page.tsx
+// File: C:\projects\insider\src\app\(site)\page.tsx
 import * as entry from '../../../../src/app/(site)/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

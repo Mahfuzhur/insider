@@ -1,4 +1,4 @@
-// File: C:\Users\Mahfuzhur\AppData\Local\Temp\claude\C--amazon-belleron-wallet-ai-image\224b66c2-3c4b-4d24-863f-51a64b228afd\scratchpad\insider\src\app\api\upload\logo\route.ts
+// File: C:\projects\insider\src\app\api\upload\logo\route.ts
 import * as entry from '../../../../../../src/app/api/upload/logo/route.js'
 import type { NextRequest } from 'next/server.js'
 
