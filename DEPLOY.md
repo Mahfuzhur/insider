@@ -157,6 +157,32 @@ case-sensitive. **Never import a raw local mysqldump** — it creates
 
 ---
 
+## PART E — Uploaded media (ONLY if you added/changed images or hero video locally)
+
+`public/uploads/` is **gitignored** — hero frames, gallery images, logos and
+project photos do NOT travel via git. If you uploaded media through the LOCAL
+admin panel, ship it:
+
+1. On your PC (Git Bash) — find what the DB actually references, then pack it:
+   ```bash
+   cd /c/projects/insider
+   tar -czf ~/Downloads/insider-uploads.tar.gz public/uploads
+   ```
+   (Or pack only the referenced folders to keep it small — check
+   `SiteSetting.heroFrameDir`, `SiteSetting.logoUrl`, and the url columns of
+   ProjectImage/GalleryImage/CircleImage. Skip `public/uploads/review` if the
+   reviews use Facebook/YouTube links.)
+
+2. File Manager → app root → Upload the tarball → verify its size → Extract.
+
+3. No restart needed — `public/` files are served immediately.
+
+Media uploaded through the **live** admin panel goes straight to the server's
+disk and needs nothing — but it is NOT in git, so keep occasional backups
+(File Manager → Compress `public/uploads` → Download).
+
+---
+
 ## TROUBLESHOOTING
 
 **Site serves the old version no matter what (restart does nothing)**
