@@ -299,6 +299,55 @@ export async function moveGalleryImage(fd: FormData) {
   revalidatePath("/admin/gallery");
 }
 
+/* ---------- Circle gallery ---------- */
+
+export async function updateCircleCaption(fd: FormData) {
+  await requireSession();
+  await prisma.circleImage.update({
+    where: { id: str(fd, "id") },
+    data: { caption: str(fd, "caption") },
+  });
+  refreshSite();
+  revalidatePath("/admin/circle-gallery");
+}
+
+export async function deleteCircleImage(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const img = await prisma.circleImage.findUnique({ where: { id } });
+  if (img) {
+    await prisma.circleImage.delete({ where: { id } });
+    if (img.url.startsWith("/uploads/circle/")) {
+      try {
+        await unlink(path.join(process.cwd(), "public", img.url));
+      } catch {
+        /* file already gone — ignore */
+      }
+    }
+  }
+  refreshSite();
+  revalidatePath("/admin/circle-gallery");
+}
+
+export async function moveCircleImage(fd: FormData) {
+  await requireSession();
+  const id = str(fd, "id");
+  const dir = str(fd, "dir");
+  const all = await prisma.circleImage.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+  });
+  const i = all.findIndex((g) => g.id === id);
+  const j = dir === "up" ? i - 1 : i + 1;
+  if (i !== -1 && j >= 0 && j < all.length) {
+    await prisma.$transaction([
+      prisma.circleImage.update({ where: { id: all[i].id }, data: { order: j } }),
+      prisma.circleImage.update({ where: { id: all[j].id }, data: { order: i } }),
+    ]);
+  }
+  refreshSite();
+  revalidatePath("/admin/circle-gallery");
+}
+
 /* ---------- Client review ---------- */
 
 /** Add a review from a pasted link (YouTube/Vimeo/Facebook/file URL). */

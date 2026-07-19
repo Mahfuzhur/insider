@@ -90,6 +90,12 @@ export async function getReviews() {
   });
 }
 
+export async function getCircleImages() {
+  return prisma.circleImage.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+  });
+}
+
 export type ProjectWithRelations = Awaited<
   ReturnType<typeof getProjects>
 >[number];

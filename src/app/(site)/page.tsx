@@ -5,8 +5,10 @@ import VideoScrubHero from "@/components/site/VideoScrubHero";
 import Marquee from "@/components/site/Marquee";
 import ProjectCard from "@/components/site/ProjectCard";
 import ScrollGallery from "@/components/site/ScrollGallery";
+import CircleGallery from "@/components/site/CircleGallery";
 import ClientReview from "@/components/site/ClientReview";
 import {
+  getCircleImages,
   getFeaturedProjects,
   getGalleryImages,
   getReviews,
@@ -80,13 +82,15 @@ function heroRooms(
 }
 
 export default async function HomePage() {
-  const [settings, featured, services, gallery, reviews] = await Promise.all([
-    getSettings(),
-    getFeaturedProjects(6),
-    getServices(),
-    getGalleryImages(),
-    getReviews(),
-  ]);
+  const [settings, featured, services, gallery, reviews, circleImages] =
+    await Promise.all([
+      getSettings(),
+      getFeaturedProjects(6),
+      getServices(),
+      getGalleryImages(),
+      getReviews(),
+      getCircleImages(),
+    ]);
 
   const words = wordsToArray(settings.heroWords);
   const dbRooms = heroRooms(featured);
@@ -146,6 +150,8 @@ export default async function HomePage() {
       )}
 
       <ScrollGallery images={gallery} />
+
+      <CircleGallery images={circleImages} />
 
       <ClientReview reviews={reviews} />
 
