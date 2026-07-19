@@ -131,6 +131,9 @@ export default async function HomePage() {
           frameCount={settings.heroFrameCount}
           speed={settings.heroSpeed}
           caption={settings.heroCaption}
+          logoUrl={settings.logoUrl}
+          brandName={settings.brandName}
+          introTagline={settings.brandTagline}
         />
       ) : (
         <Hero
